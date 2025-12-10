@@ -126,9 +126,9 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
     const data = await res.json();
     if (data?.user) {
       // reflect changes locally
-      alert("Profile saved");
+      alert("Profile saved Loved it!  ");
       // Optionally revalidate server components or refresh page to pick up new session data
-      router.refresh();
+      router.refresh(); 
     } else {
       alert("Failed to save profile");
     }
