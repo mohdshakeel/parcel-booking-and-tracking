@@ -43,8 +43,11 @@ export async function PUT(req, { params }) {
       { status: 401 }
     );
   }
+  
+  const data = await req.json();
+  const id = data.id;
 
-  const requestedUserId = params.id;        // /api/users/:id
+  const requestedUserId = id;        // /api/users/:id
   const sessionUserId = session.user.id;    // logged-in user id
   const role = session.user.role;           // "user" | "admin"
 
@@ -64,9 +67,8 @@ export async function PUT(req, { params }) {
   try {
     await connectDB();
 
-    const { id } = params;
-    const data = await req.json();
-
+    //const { id } = params;
+    
     const user = await User.findByIdAndUpdate(id, data, {
       new: true,
     }).select("-password");
