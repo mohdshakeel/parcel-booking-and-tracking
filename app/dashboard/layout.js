@@ -159,7 +159,7 @@ export default function DashboardLayout({ children }) {
                             />
                 <div className="text-black-300 text-xs">
                   {session?.user?.name}
-                   <ChevronDown className="w-4 h-4 ml-2 float-right" />
+                   <ChevronDown className="w-4 h-4 ml-2 float-right" /> 
                 </div>
               </button>
 
