@@ -17,7 +17,7 @@ import {
   Home,
   Settings,
   Package,
-  User, ChevronDown,
+  User, ChevronDown,LogOut,Truck
 } from "lucide-react";
 
 export default function DashboardLayout({ children }) {
@@ -51,6 +51,7 @@ export default function DashboardLayout({ children }) {
     { name: "Dashboard", href: "/dashboard", icon: <Home size={20} /> },
     { name: "Profile", href: "/dashboard/profile", icon: <User size={20} /> },
     { name: "Bookings", href: "/dashboard/myparcels", icon: <Package size={20} /> },
+    { name: "BookParcel", href: "/dashboard/booking", icon: <Truck size={20} /> },
     { name: "Settings", href: "/dashboard/settings", icon: <Settings size={20} /> },
   ];
 
@@ -158,24 +159,22 @@ export default function DashboardLayout({ children }) {
                             />
                 <div className="text-black-300 text-xs">
                   {session?.user?.name}
-                   <ChevronDown className="w-4 h-4 ml-2" />
+                   <ChevronDown className="w-4 h-4 ml-2 float-right" />
                 </div>
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-3 w-40 bg-white dark:bg-gray-700 shadow-md rounded-md p-2">
+                <div className="absolute z-1 right-0 mt-3 w-40 bg-white dark:bg-gray-700 shadow-md rounded-md p-2">
                   <Link
                     href="/dashboard/profile"
-                    className="block p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                    className="block p-2 py-1 my-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
                   >
                     My Profile
                   </Link>
-                  <button
-      onClick={logout}
-      className="px-4 py-2 bg-red-600 text-white rounded-lg"
-    >
-      Logout
-    </button>
+                  <Link href="#" onClick={logout}
+                   className="block p-2 py-1 my-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                   ><LogOut className="w-4 h-4" />Logout
+                   </Link>
                 </div>
               )}
             </div>
