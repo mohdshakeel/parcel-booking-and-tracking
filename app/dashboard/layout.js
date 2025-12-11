@@ -172,9 +172,14 @@ export default function DashboardLayout({ children }) {
                     My Profile
                   </Link>
                   <Link href="#" onClick={logout}
-                   className="block p-2 py-1 my-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
-                   ><LogOut className="w-4 h-4" />Logout
-                   </Link>
+     className="block p-2 py-1 my-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+>
+  <span className="flex items-center gap-2">
+    <LogOut className="w-4 h-4" />
+    Logout
+  </span>
+</Link>
+
                 </div>
               )}
             </div>
