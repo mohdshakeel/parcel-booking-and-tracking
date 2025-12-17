@@ -8,6 +8,7 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,7 +16,7 @@ export default function ResetPassword() {
     const res = await fetch("/api/auth/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ token, password ,confirmPassword}),
     });
 
     const data = await res.json();
@@ -35,7 +36,20 @@ export default function ResetPassword() {
             placeholder="Enter new password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-required
           />
+
+          {/* Confirm Password */}
+  <label className="block mb-2 font-medium">Confirm Password</label>
+  <input
+    type="password"
+    className="w-full p-3 border rounded-lg mb-4"
+    placeholder="Confirm new password"
+    value={confirmPassword}
+    onChange={(e) => setConfirmPassword(e.target.value)}
+    required
+  />
+
 
           <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
             Reset Password

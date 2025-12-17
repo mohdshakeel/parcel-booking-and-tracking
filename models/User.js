@@ -13,13 +13,14 @@ const UserSchema = new mongoose.Schema(
     city: String,
     zipCode: String,
     profileImage: String,
-    otp: String,
-    otpExpiry: Date,
     role: {
       type: String,
       enum: ["user", "admin"],
       default: "user",
-    }
+    },
+    emailVerified: { type: Boolean, default: false },
+    emailVerifyToken: String,
+    emailVerifyExpires: Date,
   },
   { timestamps: true }
 );

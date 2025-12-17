@@ -12,8 +12,18 @@ const ParcelSchema = new mongoose.Schema({
   parcelType: String,
   weight: Number,
   price: Number,
-
-  trackingId: String,
+  status: {
+      type: String,
+      enum: ["Booked","Picked-Up","In-Transit","Out For Delivery","Delivered", "Pending", "Processing"],
+      default: "Booked",
+    },
+  size: String,
+  trackingId: {
+  type: String,
+  unique: true,
+  index: true,
+},
+  userId:String,
 
   createdAt: { type: Date, default: Date.now }
 });

@@ -1,22 +1,15 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import { useCallback, useRef, useState,useEffect } from "react";
 import Cropper from "react-easy-crop";
 import getCroppedImg from "../../../components/utils/cropImage";
 import imageCompression from "browser-image-compression";
-import { useRouter } from "next/navigation";
-import { Edit } from "lucide-react";
+import { Edit,Loader2, Check } from "lucide-react";
 import Image from "next/image";
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: session,update } = useSession();
   const user = session?.user || {};
-
-  const router = useRouter();
-
-  // Form state
- 
 
 const [name, setName] = useState("");
 const [phone, setPhone] = useState("");
@@ -25,28 +18,25 @@ const [city, setCity] = useState("");
 const [state_region, setStateRegion] = useState("");
 const [zipCode, setZipCode] = useState("");
 const [country, setCountry] = useState("");
+const [status, setStatus] = useState({ loading: false, error: "", success: false,message:"" });
 
 // Sync with session once it loads
 useEffect(() => {
   if (!session?.user) return;
 
-  // Update state only if it's still empty
-  setName((prev) => prev || session.user.name || "");
-  setPhone((prev) => prev || session.user.phone || "");
-  setAddress((prev) => prev || session.user.address || "");
-  setCity((prev) => prev || session.user.city || "");
-  setStateRegion((prev) => prev || session.user.state_region || "");
-  setZipCode((prev) => prev || session.user.zipCode || "");
-  setCountry((prev) => prev || session.user.country || "");
-
-}, [session]);
-
+  setName(session.user.name ?? "");
+  setPhone(session.user.phone ?? "");
+  setAddress(session.user.address ?? "");
+  setCity(session.user.city ?? "");
+  setStateRegion(session.user.state_region ?? "");
+  setZipCode(session.user.zipCode ?? "");
+  setCountry(session.user.country ?? "");
+}, [session?.user]);
 
 console.log("ProfilePage session data:", user);
-console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode, country });
+console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode, country, profileImage: session?.user?.profileImage });
 
-
-  // Image states
+// Image states
   const [imageFile, setImageFile] = useState(null); // original File
   const [previewUrl, setPreviewUrl] = useState(user?.profileImage || "");
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -126,17 +116,30 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
     const data = await res.json();
     if (data?.user) {
       // reflect changes locally
-      alert("Profile saved Loved it!");
+      await update({
+    name,
+    phone,
+    profileImage: previewUrl,
+    address,
+    country,
+    state_region,
+    city,
+    zipCode,
+  });
+      setStatus({ loading: false, error: "", success: true ,message:"Profile updated successfully"});
+      //alert("Profile saved Loved it!");
       // Optionally revalidate server components or refresh page to pick up new session data
       //router.refresh(); 
     } else {
-      alert("Failed to save profile");
+      setStatus({ loading: false, error: "", success: true ,message:"Failed to  update profile"});
+      
     }
   };
 
   const handleSaveChanges = async (e) => {
     e.preventDefault();
     const  id  = user.id;
+    setStatus({ loading: true, error: "", success: false });
     await saveProfile(user.id,{ id, name, phone, address, city, state_region,country,zipCode, profileImage: previewUrl });
 
     
@@ -148,6 +151,14 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
 
       {/* Profile card */}
       <div className="max-w-5xl bg-white dark:bg-gray-800 p-6 rounded-xl shadow mb-6">
+        {status.error && (
+        <p className="mb-4 text-red-600 bg-red-50 p-3 rounded-lg text-sm">{status.message}</p>
+      )}
+
+      {status.success && (
+        <p className="mb-4 text-green-700 bg-green-50 p-3 rounded-lg text-sm">{status.message}</p>
+      )}
+
         <h2 className="text-lg font-semibold mb-4 dark:text-white">Profile Photo</h2>
 
         <div
@@ -239,9 +250,18 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
           <InputBlock label="Country" value={country} onChange={setCountry} />
 
           <div className="md:col-span-2 text-right mt-4">
-            <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded-xl">
-              Save Changes
-            </button>
+            <button
+            type="submit"
+            disabled={status.loading}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-sky-600 text-white font-medium shadow hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-400 transition"
+          >
+            {status.loading ? (
+             <Loader2 className="w-4 h-4 animate-spin" />
+             ) : (
+             <Check className="w-4 h-4" />
+             )}
+            <span>{status.loading ? "Submitting..." : "Save Changes"}</span>
+          </button>
           </div>
         </form>
       </div>

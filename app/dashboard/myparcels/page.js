@@ -1,6 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { SlidersHorizontal,Search, X} from "lucide-react";
+
+
+  
 export default function DeliveryActivities() {
+const [data, setData] = useState([]);
+  const [status, setStatus] = useState("All");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [openSearch, setOpenSearch] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+
+  useEffect(() => {
+    fetch(
+      `/api/parcels?status=${status}&search=${search}&page=${page}&limit=5`
+    )
+      .then(res => res.json())
+      .then(res => {
+        setData(res.data);
+        setTotalPages(res.totalPages);
+      });
+  }, [status, search, page]);
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
       {/* Header */}
@@ -16,45 +41,88 @@ export default function DeliveryActivities() {
 
         <div className="flex flex-col gap-4 sm:flex-row lg:items-center">
           {/* Status Filters */}
-          <div className="inline-flex h-11 flex-1 w-full gap-0.5 overflow-x-auto rounded-lg bg-gray-100 p-0.5 sm:w-auto lg:min-w-fit dark:bg-gray-900">
-            {["All", "Delivered", "In-Transit", "Pending", "Processing"].map(
-              (label, i) => (
-                <button
-                  key={i}
-                  className={`h-10 flex-1 rounded-md px-2 py-2 text-xs font-medium sm:px-3 sm:text-sm lg:flex-initial ${
-                    i === 0
-                      ? "shadow-theme-xs text-gray-900 dark:text-white bg-white dark:bg-gray-800"
-                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                  }`}
-                >
-                  {label}
-                </button>
-              )
-            )}
-          </div>
+          {["All", "Delivered", "In-Transit", "Pending", "Processing"].map(label => (
+  <button
+    key={label}
+    onClick={() => {
+      setStatus(label);
+      setPage(1);
+    }}
+    className={`h-10 rounded-md px-3 text-sm ${
+      status === label
+        ? "bg-white shadow text-gray-900"
+        : "text-gray-500"
+    }`}
+  >
+    {label}
+  </button>
+))}
 
           {/* Filter Button */}
           <div className="relative">
-            <button className="shadow-theme-xs flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 sm:w-auto sm:min-w-[100px] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-              {/* Filter Icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path
-                  d="M14.6537 5.90414C14.6537 4.48433 13.5027 3.33331 12.0829 3.33331C10.6631 3.33331 9.51206 4.48433 9.51204 5.90415M14.6537 5.90414C14.6537 7.32398 13.5027 8.47498 12.0829 8.47498C10.663 8.47498 9.51204 7.32398 9.51204 5.90415M14.6537 5.90414L17.7087 5.90411M9.51204 5.90415L2.29199 5.90411M5.34694 14.0958C5.34694 12.676 6.49794 11.525 7.91777 11.525C9.33761 11.525 10.4886 12.676 10.4886 14.0958M5.34694 14.0958C5.34694 15.5156 6.49794 16.6666 7.91778 16.6666C9.33761 16.6666 10.4886 15.5156 10.4886 14.0958M5.34694 14.0958L2.29199 14.0958M10.4886 14.0958L17.7087 14.0958"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              Filter
-            </button>
+            <button
+  onClick={() => setOpenSearch(v => !v)}
+  className="shadow-theme-xs flex h-11 items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+>
+  <SlidersHorizontal className="h-4 w-4" />
+  Filter
+</button>
+{/* Search Dropdown */}
+<div
+  className={`absolute left-0 right-0 top-full z-50 mt-2 transform transition-all duration-300 ease-out ${
+    openSearch
+      ? "translate-y-0 opacity-100 pointer-events-auto"
+      : "-translate-y-3 opacity-0 pointer-events-none"
+  }`}
+>
+  <div className="absolute right-0 border border-gray-200 bg-gray-50 px-4 py-4 shadow-lg rounded-lg dark:border-gray-800 dark:bg-gray-900">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+      {/* Input */}
+      <div className="relative w-[250px] flex-shrink-0">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+        <input
+          autoFocus={openSearch}
+          type="text"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="Search order ID, company, route..."
+          className="h-11 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+        />
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => {
+            setSearch(searchValue);
+            setOpenSearch(false);
+          }}
+          className="h-11 rounded-lg bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-800"
+        >
+          Apply
+        </button>
+
+        <button
+          onClick={() => {
+            setSearchValue("");
+            setSearch("");
+            setOpenSearch(false);
+          }}
+          className="flex h-11 w-11 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-400"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
           </div>
+          
+
         </div>
       </div>
 
@@ -101,7 +169,7 @@ export default function DeliveryActivities() {
                 </th>
 
                 {/* Other table heads */}
-                {["Category", "Company", "Arrival", "Route", "Price", "Status"].map(
+                {["Sender", "Receiver", "Parcel Type", "Weight/size", "Price", "Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -116,62 +184,47 @@ export default function DeliveryActivities() {
             </thead>
 
             {/* Table Body */}
-            <tbody className="divide-x divide-y divide-gray-200 dark:divide-gray-800">
-              {/* Example Row */}
-              <tr className="transition hover:bg-gray-50 dark:hover:bg-gray-900">
-                <td className="p-4 whitespace-nowrap">
-                  <div className="flex items-center gap-3">
-                    <label className="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
-                      <span className="relative">
-                        <input type="checkbox" className="sr-only" />
-                        <span className="flex h-4 w-4 items-center justify-center rounded-sm border-[1.25px] bg-transparent border-gray-300 dark:border-gray-700">
-                          <span className="opacity-0">
-                            <svg width="12" height="12" fill="none">
-                              <path
-                                d="M10 3L4.5 8.5L2 6"
-                                stroke="white"
-                                strokeWidth="1.6666"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        </span>
-                      </span>
-                    </label>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-400">
-                      #324112
-                    </span>
-                  </div>
-                </td>
+            <tbody>
+  {data.map(parcel => (
+    <tr key={parcel._id} className="hover:bg-gray-50">
+      <td className="p-4 text-xs">#{parcel.trackingId}</td>
+      <td className="p-4 text-xs">{parcel.senderName}-{parcel.senderAddress}</td>
+      <td className="p-4 text-xs">{parcel.receiverName}-{parcel.receiverAddress}</td>
+      <td className="p-4 text-xs" > {parcel.parcelType} Booked at {new Date(parcel.createdAt).toLocaleString()}
+      </td>
+      <td className="p-4 text-xs">{parcel.weight}/{parcel.weight}</td>
+      <td className="p-4 text-xs">${parcel.price}</td>
+      <td className="p-4 text-xs">
+        <span className="text-xs font-medium">
+          {parcel.status}
+        </span>
+      </td>
+    </tr>
+  ))}
+</tbody>
 
-                <td className="p-4 text-sm whitespace-nowrap text-gray-800 dark:text-white/90">
-                  Furniture
-                </td>
-                <td className="p-4 text-sm whitespace-nowrap text-gray-800 dark:text-white/90">
-                  HomeLine
-                </td>
-                <td className="p-4 text-sm whitespace-nowrap text-gray-800 dark:text-white/90">
-                  10 Apr 2028 2:15 pm
-                </td>
-                <td className="p-4 text-sm whitespace-nowrap text-gray-800 dark:text-white/90">
-                  Berlin–Milan
-                </td>
-                <td className="p-4 text-sm whitespace-nowrap text-gray-800 dark:text-white/90">
-                  $1,250.00
-                </td>
-                <td className="p-4 whitespace-nowrap">
-                  <span className="bg-success-50 dark:bg-success-500/15 text-success-700 dark:text-success-500 text-xs rounded-full px-2 py-0.5 font-medium">
-                    Delivered
-                  </span>
-                </td>
-              </tr>
-
-              {/* Add your more rows here */}
-            </tbody>
           </table>
+          <div className="flex justify-end gap-2 p-4">
+  <button
+    disabled={page === 1}
+    onClick={() => setPage(p => p - 1)}
+  >
+    Prev
+  </button>
+
+  <span>{page} / {totalPages}</span>
+
+  <button
+    disabled={page === totalPages}
+    onClick={() => setPage(p => p + 1)}
+  >
+    Next
+  </button>
+</div>
+
         </div>
       </div>
     </div>
   );
 }
+

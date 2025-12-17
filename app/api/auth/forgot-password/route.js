@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import User from "@/models/User";
 import connectDB from "@/lib/db";
+import { sendEmail } from "@/lib/mail";
 
 export async function POST(req) {
   try {
@@ -14,11 +15,14 @@ export async function POST(req) {
 
   const resetToken = jwt.sign(
     { id: user._id },
-    process.env.RESET_TOKEN_SECRET,
+    process.env.NEXTAUTH_SECRET,
     { expiresIn: "15m" }
   );
 
-  const resetLink = `${process.env.NEXT_PUBLIC_URL}/reset-password?token=${resetToken}`;
+  const resetLink = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+  const subject = "Reset Your Password- Eagle Parcel Book and Track";
+      await sendEmail({to:email,subject:subject,html:resetLink});//send verification email
+  
 
   // send email (pseudo)
   console.log("RESET LINK =>", resetLink);

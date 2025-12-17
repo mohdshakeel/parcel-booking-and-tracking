@@ -9,8 +9,15 @@ export async function POST(req) {
 
   try {
     await connectDB();
-    const { token, password } = await req.json();
-    const decoded = jwt.verify(token, process.env.RESET_TOKEN_SECRET);
+    const { token, password,confirmPassword } = await req.json();
+    if (password !== confirmPassword) {
+      return Response.json(
+        { error: "Passwords do not match" },
+        { status: 400 }
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET);
 
     const hashed = await bcrypt.hash(password, 10);
     await User.findByIdAndUpdate(decoded.id, { password: hashed });
