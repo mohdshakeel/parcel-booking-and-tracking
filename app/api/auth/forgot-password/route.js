@@ -21,8 +21,13 @@ export async function POST(req) {
 
   const resetLink = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
   const subject = "Reset Your Password- Eagle Parcel Book and Track";
-      await sendEmail({to:email,subject:subject,html:resetLink});//send verification email
-  
+  const emailResult = await sendEmail({to:email,subject:subject,html:resetLink});//send verification email
+  if (!emailResult.success) {
+  return NextResponse.json(
+    { message: "Failed to send email" },
+    { status: 500 }
+  );
+}
 
   // send email (pseudo)
   console.log("RESET LINK =>", resetLink);
