@@ -12,7 +12,7 @@ export async function POST(req) {
     const { token, password,confirmPassword } = await req.json();
     if (password !== confirmPassword) {
       return Response.json(
-        { error: "Passwords do not match" },
+        { error: "Passwords do not match", message: "Passwords do not match" },
         { status: 400 }
       );
     }
