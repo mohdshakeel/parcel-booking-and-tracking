@@ -11,8 +11,8 @@ export async function POST(req) {
     await connectDB();
     const { token, password,confirmPassword } = await req.json();
     if (password !== confirmPassword) {
-      return Response.json(
-        { error: "Passwords do not match", message: "Passwords do not match" },
+      return NextResponse.json(
+        { message: "Passwords do not match" },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(req) {
     const hashed = await bcrypt.hash(password, 10);
     await User.findByIdAndUpdate(decoded.id, { password: hashed });
 
-    return NextResponse.json({ message: "Password reset successful" });
+    return NextResponse.json({ message: "Password reset successful"},{status:200 });
   } catch (err) {
     return NextResponse.json({ message: "Invalid or expired token",error:err.message }, { status: 400 });
   }

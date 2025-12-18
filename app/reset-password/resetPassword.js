@@ -8,11 +8,12 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState(null);
    const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+     try {
     const res = await fetch("/api/auth/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -21,6 +22,10 @@ export default function ResetPassword() {
 
     const data = await res.json();
     setMessage(data.message);
+  }catch (err) {
+    setStatus(500);
+    setMessage("An error occurred. Please try again.");
+  }
   };
 
   return (
@@ -56,9 +61,17 @@ export default function ResetPassword() {
           </button>
         </form>
 
-        {message && (
-          <p className="mt-4 text-center text-blue-600">{message}</p>
-        )}
+       {message && (
+  <p
+    className={`mt-4 text-center ${
+      status === 200 ? "text-green-600" : "text-red-600"
+    }`}
+  >
+    {message}
+  </p>
+)}
+
+
       </div>
     </div>
   );
