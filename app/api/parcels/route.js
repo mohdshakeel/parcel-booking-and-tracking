@@ -25,7 +25,8 @@ const userId = session.user.id;
   const sort = searchParams.get("sort") || "createdAt";
 
   const query = {
-    userId, // 👈 filter by logged-in user
+   // Only restrict by userId if role is NOT admin
+  ...(session?.user?.role !== "admin" && { userId }),
     ...(status !== "All" && { status }),
     ...(search && {
       $or: [

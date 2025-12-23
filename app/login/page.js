@@ -1,20 +1,24 @@
 "use client";
 import { useState,useEffect } from "react";
 import Link from "next/link";
-import { useSession, signIn} from "next-auth/react";
+import { useSession, signIn,getSession} from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
   //const session = useSession();
   const [msg, setMsg] = useState("");
-  const { status } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
   if (status === "authenticated") {
-    router.push("/dashboard/profile");
+    if (session?.user?.role === "admin") {
+      router.push("/admin/profile");
+    } else {
+      router.push("/dashboard/profile");
+    }
   }
-}, [status,router]);
+}, [status,router,session]);
 
   
   
@@ -35,13 +39,22 @@ export default function LoginPage() {
 
   if (!result?.error) {
     // SUCCESS
-    router.push("/dashboard/profile");
+    //router.push("/dashboard/profile");
     setMsg('You are successfully logged in!');
+    // Get updated session AFTER login
+  const session = await getSession();
+
+  if (session?.user?.role === "admin") {
+    router.replace("/admin/profile");
+  } else {
+    router.replace("/dashboard/profile");
+  }
   } else {
     // ERROR from NextAuth
     setMsg(result.error || "Invalid email or password");
   }
 }
+
 
 
   return (
