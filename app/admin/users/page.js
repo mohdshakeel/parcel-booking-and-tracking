@@ -21,7 +21,7 @@ const [data, setData] = useState([]);
 
   useEffect(() => {
     fetch(
-      `/api/users?status=${status}&search=${search}&page=${page}&limit=10`
+      `/api/users?role=user&status=${status}&search=${search}&page=${page}&limit=10`
     )
       .then(res => res.json())
       .then(res => {

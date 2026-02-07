@@ -23,14 +23,35 @@ const UserSchema = new mongoose.Schema(
     profileImage: String,
     role: {
       type: String,
-      enum: ["user", "admin","manager","driver"],
+      enum: ["user", "admin","manager","driver","agent"],
       default: "user",
+    },
+    driverStatus: {
+      available: {
+        type: Boolean,
+        default: true, // 🔑 MAIN FLAG
+      },
+      currentTrip: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Trip",
+        default: null,
+      },
+      lastAvailableAt: Date,
     },
     emailVerified: { type: Boolean, default: false },
     mustChangePassword : { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     emailVerifyToken: String,
     emailVerifyExpires: Date,
+    hubId: {
+             type: mongoose.Schema.Types.ObjectId,
+              ref: "Hub"
+    },
+    vehicleId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Vehicle"
+  },
+
   },
   { timestamps: true }
 );

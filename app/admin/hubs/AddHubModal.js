@@ -1,5 +1,5 @@
 "use client";
-import { X, User, Mail, Phone, MapPin } from "lucide-react";
+import { X, User, Mail, Phone, MapPin,Warehouse } from "lucide-react";
 import { useState,useEffect} from "react";
 import { Country, State, City } from "country-state-city";
 
@@ -64,14 +64,13 @@ const handleStateChange = (e) => {
     setSuccess("");
 
     try {
-      const res = await fetch("/api/users/create", {
+      const res = await fetch("/api/hubs/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
           phone: form.phone,
-          role: "user",
           address: {
             street: form.street,
             city: form.city,
@@ -88,7 +87,7 @@ const handleStateChange = (e) => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setSuccess("Customer created successfully. Login details sent by email.");
+      setSuccess("Hub created successfully.");
       onSuccess?.(data);
 
       setTimeout(() => {
@@ -134,17 +133,16 @@ const handleStateChange = (e) => {
       <div className="w-full max-w-xl rounded-xl bg-white shadow-2xl">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-800">
-            Add New Customer
-          </h2>
-          <button
-            onClick={onClose}
-            className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
-          >
-            <X size={18} />
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div className="flex items-center gap-2">
+            <Warehouse className="text-blue-600" />
+            <h2 className="text-lg font-semibold">Add Hub</h2>
+          </div>
+          <button onClick={onClose}>
+            <X />
           </button>
         </div>
+
 {successMsg && (
   <div className="mb-4 rounded-md bg-green-50 p-3 text-sm text-green-700 border border-green-200">
     ✅ {successMsg}
@@ -163,17 +161,17 @@ const handleStateChange = (e) => {
           {/* Name */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Full Name
+              Hub Name /Title
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Warehouse className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 name="name"
                 required
                 value={form.name}
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Paris"
                 className="w-full rounded-lg border border-gray-300 pl-10 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
             </div>
@@ -253,7 +251,7 @@ const handleStateChange = (e) => {
                 {countries
     .filter((c) => EU_COUNTRY_CODES.includes(c.isoCode))
     .map((country) => (
-      <option key={country.name} value={country.name}>
+      <option key={country.isoCode} value={country.isoCode}>
         {country.name}
       </option>
     ))}
@@ -277,7 +275,7 @@ const handleStateChange = (e) => {
                     >
                     <option value="">Select State / Region</option>
                     {states.map((state) => (
-                        <option key={state.name} value={state.name}>
+                        <option key={state.isoCode} value={state.isoCode}>
                         {state.name}
                         </option>
                     ))}
@@ -357,7 +355,7 @@ const handleStateChange = (e) => {
               disabled={loading}
               className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
             >
-              {loading ? "Creating..." : "Create User"}
+              {loading ? "Creating..." : "Create Hub"}
             </button>
           </div>
         </form>

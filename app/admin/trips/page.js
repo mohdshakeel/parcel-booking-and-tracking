@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal,Search, X,Truck, Pencil} from "lucide-react";
-import AddVehicleModal from "./AddVehicleModal";
+import { SlidersHorizontal,Search, X,Container} from "lucide-react";
+import AddTripModal from "./AddTripModal";
 
 
 
   
-export default function VehicleActivities() {
+export default function TripActivities() {
 const [data, setData] = useState([]);
   const [status, setStatus] = useState("All");
   const [search, setSearch] = useState("");
@@ -15,22 +15,19 @@ const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [openSearch, setOpenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [openVehicleModal, setOpenVehicleModal] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [openTripModal, setOpenTripModal] = useState(false);
 
 
   useEffect(() => {
     fetch(
-      `/api/vehicles?status=${status}&search=${search}&page=${page}&limit=10`
+      `/api/consignments?status=${status}&search=${search}&page=${page}&limit=5`
     )
       .then(res => res.json())
       .then(res => {
-       setData(res.vehicles ?? []);      // ✅ fallback to empty array
-      setTotalPages(res.totalPages ?? 1);
+        setData(res.data);
+        setTotalPages(res.totalPages);
       });
   }, [status, search, page]);
-
-  
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -39,21 +36,20 @@ const [data, setData] = useState([]);
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             <div className="flex"><button
-          onClick={() => setOpenVehicleModal(true)}
+          onClick={() => setOpenTripModal(true)}
           className="flex px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        ><Truck size="20" color="white" className="mt-1 mr-1"></Truck>
-           Add New Vehicle
-        </button></div>
+        ><Container size="20" color="white" className="mt-1 mr-1" />
+           Add New Trip
+        </button></div> 
           </h3>
-          
           <p className="text-sm text-gray-500 dark:text-gray-400">
-           Know your vehicles status and details at a glance.
+            Track your recent trips and their statuses at a glance.
           </p>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row lg:items-center">
           {/* Status Filters */}
-          {["All", "In-Transit", "Idle"].map(label => (
+          {["All", "Delivered", "In-Transit"].map(label => (
   <button
     key={label}
     onClick={() => {
@@ -98,7 +94,7 @@ const [data, setData] = useState([]);
           type="text"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          placeholder="Search vehicle ID, type, regisration number..."
+          placeholder="Search consignment ID, company, route..."
           className="h-11 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
         />
       </div>
@@ -144,10 +140,10 @@ const [data, setData] = useState([]);
           <table className="min-w-full w-full table-auto">
             <thead>
               <tr className="border-b border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-                
+               
 
                 {/* Other table heads */}
-                {["Edit","Vehicle Type", "Vehicle Number", "Vehicle Capacity & Volume", "Vehicle Modal", "Registration", "Insurance","Status"].map(
+                {["Trip", "Driver", "Vehicle", "Consignment Counts", "Pracel Counts", "Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -163,50 +159,36 @@ const [data, setData] = useState([]);
 
             {/* Table Body */}
             <tbody>
-  {data.map(vehicle => (
-    <tr key={vehicle._id} className="hover:bg-gray-50">
-      <td className="p-4 text-xs"><button
-  onClick={() => {
-    setSelectedVehicle(vehicle);
-    setOpenVehicleModal(true);
-  }}
-  className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
-  title="Edit Vehicle"
->
-  <Pencil size={18} />
-</button>
-</td>
-      <td className="p-4 text-xs">{vehicle.vehicleType}</td>
-      <td className="p-4 text-xs">{vehicle.vehicleNumber}</td>
-      <td className="p-4 text-xs">{vehicle.capacityKg}-{vehicle.capacityVolume?.capacityVolume}</td>
-      <td className="p-4 text-xs">{vehicle.brand}-{vehicle.model}-{vehicle.color}-{vehicle.year}</td>
-      <td className="p-4 text-xs">{vehicle.registration.rcNumber}</td>
-      <td className="p-4 text-xs">{vehicle.insurance.policyNumber}</td>
-      <td className="p-4 text-xs"><span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${
-              vehicle.status === "Active"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
-            }`}
-          >
-            {vehicle.status ? "Active" : "Inactive"}
-          </span></td>
+  {data.map(trip => (
+    <tr key={trip._id} className="hover:bg-gray-50">
+      <td className="p-4 text-xs">#{trip.trackingId}</td>
+      <td className="p-4 text-xs">{parcel.senderName}-{parcel.senderAddress}</td>
+      <td className="p-4 text-xs">{parcel.receiverName}-{parcel.receiverAddress}</td>
+      <td className="p-4 text-xs" > {parcel.parcelType} Booked at {new Date(parcel.createdAt).toLocaleString()}
+      </td>
+      <td className="p-4 text-xs">{parcel.weight}/{parcel.weight}</td>
+      <td className="p-4 text-xs">${parcel.price}</td>
+      <td className="p-4 text-xs">
+        <span className="text-xs font-medium">
+          {parcel.status}
+        </span>
+      </td>
     </tr>
   ))}
 </tbody>
 
           </table>
           <div className="flex justify-end gap-2 p-4">
-  <button className="text-xs" 
+  <button
     disabled={page === 1}
     onClick={() => setPage(p => p - 1)}
   >
     Prev
   </button>
 
-  <span className="text-xs">{page} / {totalPages}</span>
+  <span>{page} / {totalPages}</span>
 
-  <button className="text-xs" 
+  <button
     disabled={page === totalPages}
     onClick={() => setPage(p => p + 1)}
   >
@@ -216,18 +198,10 @@ const [data, setData] = useState([]);
 
         </div>
       </div>
-{/* Modal */} 
-      {openVehicleModal && <AddVehicleModal 
-      vehicle={selectedVehicle}
-         onClose={() => {
-            setOpenVehicleModal(false);
-            setSelectedVehicle(null);
-          }}
-           />}
 
+      {/* Modal */}
+            {openTripModal && <AddTripModal onClose={() => setOpenTripModal(false)} />}
     </div>
-
-    
   );
 }
 

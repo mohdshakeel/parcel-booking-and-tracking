@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import User from "@/models/User";
+import Hub from "@/models/Hub";
 import { sendEmail } from "@/lib/mail";
 import crypto from "crypto";
 //import bcrypt from "bcryptjs";
@@ -25,8 +25,6 @@ export async function POST(req) {
       email,
       phone,
       address,
-      role,
-      hubId,
     } = await req.json();
 
     // Validation
@@ -46,30 +44,37 @@ export async function POST(req) {
     }
 
     // Check existing user
-    const existingUser = await User.findOne({ email });
+    const existingUser = await Hub.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { message: "User already exists", success: false },
+        { message: "Hub already exists", success: false },
+        { status: 400 }
+      );
+    }
+
+    // Check existing user
+    const existingName = await Hub.findOne({ name });
+    if (existingName) {
+      return NextResponse.json(
+        { message: "Hub already exists", success: false },
         { status: 400 }
       );
     }
 
     // Generate temp password
-    const tempPassword = generateTempPassword(10);
+    //const tempPassword = generateTempPassword(10);
     //const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
     // Email verification token
-    const emailVerifyToken = crypto.randomBytes(32).toString("hex");
-    //role  = role || "user";
+    //const emailVerifyToken = crypto.randomBytes(32).toString("hex");
+
     // Create user
-    const user = await User.create({
+    const user = await Hub.create({
       name,
       email,
       phone,
-      password: tempPassword,
-      role: role || "user",
-      ...(hubId && { hubId }), // ✅ insert only if not empty
-
+      
+      
       address: {
         street: address.street,
         city: address.city,
@@ -78,12 +83,11 @@ export async function POST(req) {
         country: address.country,
       },
 
-      isEmailVerified: false,
-      mustChangePassword: true, // 🔐 important
-      emailVerifyToken,
-      emailVerifyExpires: Date.now() + 24 * 60 * 60 * 1000,
+      
     });
 
+
+    /*
     // Email content
     const verifyUrl = `${process.env.NEXTAUTH_URL}/verify-email?token=${emailVerifyToken}`;
 
@@ -103,17 +107,17 @@ export async function POST(req) {
         <p>You will be required to change your password after login.</p>
       `,
     });
-
+    */
     return NextResponse.json(
       {
         success: true,
-        message: "User created successfully. Temporary password sent by email.",
-        userId: user._id,
+        message: "Hub created successfully.",
+        hubId: user._id,
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Create user error:", error);
+    console.error("Create hub error:", error);
 
     return NextResponse.json(
       {

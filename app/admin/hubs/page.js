@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal,Search, X,Truck, Pencil} from "lucide-react";
-import AddVehicleModal from "./AddVehicleModal";
+import { SlidersHorizontal,Search, X, Warehouse} from "lucide-react";
+import AddHubModal from "./AddHubModal";
+//import User from "@/models/User";
 
 
 
   
-export default function VehicleActivities() {
+export default function UserActivities() {
 const [data, setData] = useState([]);
   const [status, setStatus] = useState("All");
   const [search, setSearch] = useState("");
@@ -15,18 +16,17 @@ const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [openSearch, setOpenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [openVehicleModal, setOpenVehicleModal] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [openHubModal, setOpenHubModal] = useState(false);
 
 
   useEffect(() => {
     fetch(
-      `/api/vehicles?status=${status}&search=${search}&page=${page}&limit=10`
+      `/api/hubs?status=${status}&search=${search}&page=${page}&limit=10`
     )
       .then(res => res.json())
       .then(res => {
-       setData(res.vehicles ?? []);      // ✅ fallback to empty array
-      setTotalPages(res.totalPages ?? 1);
+       setData(res.users ?? []);      // ✅ fallback to empty array
+       setTotalPages(res.totalPages ?? 1);
       });
   }, [status, search, page]);
 
@@ -39,36 +39,36 @@ const [data, setData] = useState([]);
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             <div className="flex"><button
-          onClick={() => setOpenVehicleModal(true)}
+          onClick={() => setOpenHubModal(true)}
           className="flex px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        ><Truck size="20" color="white" className="mt-1 mr-1"></Truck>
-           Add New Vehicle
+        ><Warehouse size="20" color="white" className="mt-1 mr-1"></Warehouse>
+           Add New Hub
         </button></div>
           </h3>
           
           <p className="text-sm text-gray-500 dark:text-gray-400">
-           Know your vehicles status and details at a glance.
+           Know your hubs status and details at a glance.
           </p>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row lg:items-center">
           {/* Status Filters */}
-          {["All", "In-Transit", "Idle"].map(label => (
-  <button
-    key={label}
-    onClick={() => {
-      setStatus(label);
-      setPage(1);
-    }}
-    className={`h-10 rounded-md px-3 text-sm ${
-      status === label
-        ? "bg-white shadow text-gray-900"
-        : "text-gray-500"
-    }`}
-  >
-    {label}
-  </button>
-))}
+          {["All", "Verified", "Active"].map(label => (
+                <button
+                  key={label}
+                  onClick={() => {
+                    setStatus(label);
+                    setPage(1);
+                  }}
+                  className={`h-10 rounded-md px-3 text-sm ${
+                    status === label
+                      ? "bg-white shadow text-gray-900"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {label}
+                </button>
+           ))}
 
           {/* Filter Button */}
           <div className="relative">
@@ -98,7 +98,7 @@ const [data, setData] = useState([]);
           type="text"
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
-          placeholder="Search vehicle ID, type, regisration number..."
+          placeholder="Search Hub ID, Hub name, city, country phone number..."
           className="h-11 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
         />
       </div>
@@ -147,7 +147,7 @@ const [data, setData] = useState([]);
                 
 
                 {/* Other table heads */}
-                {["Edit","Vehicle Type", "Vehicle Number", "Vehicle Capacity & Volume", "Vehicle Modal", "Registration", "Insurance","Status"].map(
+                {["Hub", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Manager","Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -163,37 +163,67 @@ const [data, setData] = useState([]);
 
             {/* Table Body */}
             <tbody>
-  {data.map(vehicle => (
-    <tr key={vehicle._id} className="hover:bg-gray-50">
-      <td className="p-4 text-xs"><button
-  onClick={() => {
-    setSelectedVehicle(vehicle);
-    setOpenVehicleModal(true);
-  }}
-  className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
-  title="Edit Vehicle"
->
-  <Pencil size={18} />
-</button>
-</td>
-      <td className="p-4 text-xs">{vehicle.vehicleType}</td>
-      <td className="p-4 text-xs">{vehicle.vehicleNumber}</td>
-      <td className="p-4 text-xs">{vehicle.capacityKg}-{vehicle.capacityVolume?.capacityVolume}</td>
-      <td className="p-4 text-xs">{vehicle.brand}-{vehicle.model}-{vehicle.color}-{vehicle.year}</td>
-      <td className="p-4 text-xs">{vehicle.registration.rcNumber}</td>
-      <td className="p-4 text-xs">{vehicle.insurance.policyNumber}</td>
-      <td className="p-4 text-xs"><span
+  {data.map((users) => {
+    const address =
+      typeof users.address === "object"
+        ? users.address
+        : {
+            street: users.address || "",
+            city: users.city || "",
+            state: users.state_region || "",
+            zipcode: users.zipCode || "",
+            country: users.country || "",
+          };
+
+    return (
+      <tr key={users._id} className="hover:bg-gray-50">
+       
+
+        <td className="p-4 text-xs">{users.name}</td>
+        <td className="p-4 text-xs">{users.email}</td>
+        <td className="p-4 text-xs">{users.phone}</td>
+
+        <td className="p-4 text-xs">
+          {address.street || "-"}
+        </td>
+
+        <td className="p-4 text-xs">
+          {address.city}-{address.zipcode}
+        </td>
+
+        <td className="p-4 text-xs">
+          {address.state} {address.country}
+        </td>
+
+        
+        <td className="p-4 text-xs">
+          <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
-              vehicle.status === "Active"
+              users.emailVerified
                 ? "bg-green-100 text-green-700"
                 : "bg-red-100 text-red-700"
             }`}
           >
-            {vehicle.status ? "Active" : "Inactive"}
-          </span></td>
-    </tr>
-  ))}
+            {users.emailVerified ? "Yes" : "No"}
+          </span>
+        </td>
+
+        <td className="p-4 text-xs">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              users.isActive
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {users.isActive ? "Active" : "Inactive"}
+          </span>
+        </td>
+      </tr>
+    );
+  })}
 </tbody>
+
 
           </table>
           <div className="flex justify-end gap-2 p-4">
@@ -216,14 +246,9 @@ const [data, setData] = useState([]);
 
         </div>
       </div>
-{/* Modal */} 
-      {openVehicleModal && <AddVehicleModal 
-      vehicle={selectedVehicle}
-         onClose={() => {
-            setOpenVehicleModal(false);
-            setSelectedVehicle(null);
-          }}
-           />}
+
+{/* Modal */}
+      {openHubModal && <AddHubModal onClose={() => setOpenHubModal(false)} />}
 
     </div>
 

@@ -14,7 +14,7 @@ const ParcelSchema = new mongoose.Schema({
   price: Number,
   status: {
       type: String,
-      enum: ["Booked","Picked-Up","In-Transit","Out For Delivery","Delivered", "Pending", "Processing"],
+      enum: ["Booked","Picked-Up","At Hub","In-Transit","Out For Delivery","Delivered", "Pending", "Processing"],
       default: "Booked",
     },
   size: String,
@@ -23,7 +23,24 @@ const ParcelSchema = new mongoose.Schema({
   unique: true,
   index: true,
 },
-  userId:String,
+sourceHubId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Hub",
+  required: true
+},
+
+destinationHubId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Hub",
+  required: true
+},
+consignmentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Consignment",
+    default: null,
+},
+
+userId:String,
 
   createdAt: { type: Date, default: Date.now }
 });

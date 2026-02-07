@@ -8,5 +8,5 @@ export async function GET() {
   const drivers = await User.find({ role: "driver" })
     .select("_id name phone");
 
-  return NextResponse.json(drivers);
+  return NextResponse.json({success:true,drivers});
 }

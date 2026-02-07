@@ -16,7 +16,9 @@ const ZIP_LOOKUP_SUPPORTED = ["IE", "FR"];
 const CITY_DROPDOWN_SUPPORTED = ["DE", "IT"];
 
 
-export default function AddCustomerModal({ onClose, onSubmit }) {
+export default function AddDriverModal({ driver, onClose, onSuccess }) {
+  console.log(driver);
+  const isEdit = Boolean(driver?._id);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -33,6 +35,85 @@ const [cities, setCities] = useState([]);
 const [loading, setLoading] = useState(false);
 const [errorMsg, setError] = useState("");
 const [successMsg, setSuccess] = useState("");
+
+
+const [hubs, setHubs] = useState([]);
+const [vehicles, setVehicles] = useState([]);
+
+const [selectedHub, setSelectedHub] = useState("");
+const [selectedVehicle, setSelectedVehicle] = useState("");
+useEffect(() => {
+  if (!isEdit || !driver) return;
+
+  // 1) Fill basic form values
+  setForm({
+    name: driver.name || "",
+    email: driver.email || "",
+    phone: driver.phone || "",
+    street: driver.address?.street || "",
+    city: driver.address?.city || "",
+    state: driver.address?.state || "",
+    zipcode: driver.address?.zipcode || "",
+    country: driver.address?.country || "",
+  });
+
+  // 2) Fill hub + vehicle dropdown values
+  setSelectedHub(driver.hubId?._id || driver.hubId || "");
+  setSelectedVehicle(driver.vehicleId?._id || driver.vehicleId || "");
+
+  // 3) Load states based on country
+  const countryCode = driver.address?.country || "";
+  if (countryCode) {
+    const stateList = State.getStatesOfCountry(countryCode);
+    setStates(stateList);
+
+    // 4) Load cities based on country + state
+    const stateCode = driver.address?.state || "";
+    if (stateCode) {
+      const cityList = City.getCitiesOfState(countryCode, stateCode);
+      setCities(cityList);
+    } else {
+      setCities([]);
+    }
+  } else {
+    setStates([]);
+    setCities([]);
+  }
+}, [isEdit, driver]);
+
+useEffect(() => {
+ fetch("/api/hubs?dropdown=true")
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) setHubs(data.hubs);
+    });
+}, []);
+
+useEffect(() => {
+  if (!selectedHub) {
+    setVehicles([]);
+    setSelectedVehicle("");
+    return;
+  }
+
+  fetch(`/api/vehicles`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        setVehicles(data.vehicles);
+
+        // keep selectedVehicle if already set (edit mode)
+        if (isEdit && driver?.vehicleId) {
+          setSelectedVehicle(driver.vehicleId?._id || driver.vehicleId);
+        }
+      }
+    });
+}, [isEdit,selectedHub,driver.vehicleId]);
+
+
+
+
+
 
 
 
@@ -58,48 +139,57 @@ const handleStateChange = (e) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  setSuccess("");
 
-    try {
-      const res = await fetch("/api/users/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          role: "user",
-          address: {
-            street: form.street,
-            city: form.city,
-            state: form.state,
-            zipcode: form.zipcode,
-            country: form.country,
-          },
-        }),
-      });
+  try {
+    const url = isEdit
+      ? `/api/users/update/${driver._id}`
+      : `/api/users/create`;
 
-      const data = await res.json();
+    const method = isEdit ? "PUT" : "POST";
 
-      if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
-      }
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        role: "driver",
+        hubId: selectedHub,
+        vehicleId: selectedVehicle,
+        address: {
+          street: form.street,
+          city: form.city,
+          state: form.state,
+          zipcode: form.zipcode,
+          country: form.country,
+        },
+      }),
+    });
 
-      setSuccess("Customer created successfully. Login details sent by email.");
-      onSuccess?.(data);
+    const data = await res.json();
 
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(data.message || "Something went wrong");
     }
-  };
+
+    setSuccess(isEdit ? "Driver updated successfully." : "Driver created successfully.");
+    onSuccess?.(data);
+
+    setTimeout(() => {
+      onClose();
+    }, 1200);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
  
         
@@ -136,8 +226,11 @@ const handleStateChange = (e) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            Add New Customer
-          </h2>
+             
+               {isEdit ? "Edit Driver" : "Add New Driver"}
+            </h2>
+
+          
           <button
             onClick={onClose}
             className="rounded-full p-2 text-gray-500 hover:bg-gray-100"
@@ -163,7 +256,7 @@ const handleStateChange = (e) => {
           {/* Name */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Full Name
+              Name *
             </label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -183,25 +276,25 @@ const handleStateChange = (e) => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Email
+                Email *
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <input
-                  type="email"
-                  name="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="john@example.com"
-                  className="w-full rounded-lg border border-gray-300 pl-10 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
+  type="email"
+  name="email"
+  required
+  disabled={isEdit}
+  value={form.email}
+  onChange={handleChange}
+  className="w-full rounded-lg border border-gray-300 pl-10 py-2 text-sm disabled:bg-gray-100"
+/>
               </div>
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Phone
+                Phone *
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -213,15 +306,59 @@ const handleStateChange = (e) => {
                   onChange={handleChange}
                   placeholder="+91 98765 43210"
                   className="w-full rounded-lg border border-gray-300 pl-10 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                />
+                />~
               </div>
             </div>
           </div>
 
+          {/* HUB AND VEHICLE*/}
+
+          <div>
+  <label className="mb-1 block text-sm font-medium text-gray-700">
+    Assign Hub *
+  </label>
+  <select
+    value={selectedHub}
+    required
+    onChange={(e) => setSelectedHub(e.target.value)}
+    className="w-full rounded-lg border px-3 py-2 text-sm"
+  >
+    <option value="">Select Hub</option>
+    {hubs.map(hub => (
+      <option key={hub._id} value={hub._id}>
+        {hub.name}
+      </option>
+    ))}
+  </select>
+</div>
+<div>
+  <label className="mb-1 block text-sm font-medium text-gray-700">
+    Assign Vehicle *
+  </label>
+  <select
+    value={selectedVehicle}
+    required
+    disabled={!selectedHub}
+    onChange={(e) => setSelectedVehicle(e.target.value)}
+    className="w-full rounded-lg border px-3 py-2 text-sm disabled:bg-gray-100"
+  >
+    <option value="">
+      {selectedHub ? "Select Vehicle" : "Select hub first"}
+    </option>
+
+    {vehicles.map(vehicle => (
+      <option key={vehicle._id} value={vehicle._id}>
+        {vehicle.vehicleNumber} ({vehicle.vehicleType})
+      </option>
+    ))}
+  </select>
+</div>
+
+
           {/* Street */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Street Address
+              Street Address *
             </label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -240,7 +377,7 @@ const handleStateChange = (e) => {
           {/* Country */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Country
+              Country *
             </label>
             <select
                 name="country"
@@ -253,7 +390,7 @@ const handleStateChange = (e) => {
                 {countries
     .filter((c) => EU_COUNTRY_CODES.includes(c.isoCode))
     .map((country) => (
-      <option key={country.name} value={country.name}>
+      <option key={country.isoCode} value={country.isoCode}>
         {country.name}
       </option>
     ))}
@@ -266,7 +403,7 @@ const handleStateChange = (e) => {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                State / Region / Province
+                State / Region / Province *
               </label>
               <select
                     name="state"
@@ -277,7 +414,7 @@ const handleStateChange = (e) => {
                     >
                     <option value="">Select State / Region</option>
                     {states.map((state) => (
-                        <option key={state.name} value={state.name}>
+                        <option key={state.isoCode} value={state.isoCode}>
                         {state.name}
                         </option>
                     ))}
@@ -327,7 +464,7 @@ const handleStateChange = (e) => {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Zip Code
+                Zip Code *
               </label>
               <input
                 type="text"
@@ -353,12 +490,13 @@ const handleStateChange = (e) => {
               Cancel
             </button>
             <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
-            >
-              {loading ? "Creating..." : "Create User"}
-            </button>
+  type="submit"
+  disabled={loading}
+  className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
+>
+  {loading ? (isEdit ? "Updating..." : "Adding...") : (isEdit ? "Update Driver" : "Add Driver")}
+</button>
+
           </div>
         </form>
       </div>

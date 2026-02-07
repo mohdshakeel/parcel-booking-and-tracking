@@ -33,8 +33,16 @@ const [cities, setCities] = useState([]);
 const [loading, setLoading] = useState(false);
 const [errorMsg, setError] = useState("");
 const [successMsg, setSuccess] = useState("");
+const [hubs, setHubs] = useState([]);
+const [hubId, setHubId] = useState("");
 
+useEffect(() => {
+    fetch("/api/hubs?dropdown=true")
+      .then(res => res.json())
+      .then(res => setHubs(res.hubs || []));
 
+    
+  }, []);
 
 
 const handleCountryChange = (e) => {
@@ -71,7 +79,8 @@ const handleStateChange = (e) => {
           name: form.name,
           email: form.email,
           phone: form.phone,
-          role: "user",
+          role: "agent",
+          hubId: hubId,
           address: {
             street: form.street,
             city: form.city,
@@ -88,7 +97,7 @@ const handleStateChange = (e) => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setSuccess("Customer created successfully. Login details sent by email.");
+      setSuccess("Delivery Agent created successfully. Login details sent by email.");
       onSuccess?.(data);
 
       setTimeout(() => {
@@ -136,7 +145,7 @@ const handleStateChange = (e) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            Add New Customer
+            Add New Deilvery Agent
           </h2>
           <button
             onClick={onClose}
@@ -163,7 +172,7 @@ const handleStateChange = (e) => {
           {/* Name */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Full Name
+              Name *
             </label>
             <div className="relative">
               <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -183,7 +192,7 @@ const handleStateChange = (e) => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Email
+                Email *
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -201,7 +210,7 @@ const handleStateChange = (e) => {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Phone
+                Phone *
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -221,7 +230,7 @@ const handleStateChange = (e) => {
           {/* Street */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Street Address
+              Street Address *
             </label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -236,11 +245,27 @@ const handleStateChange = (e) => {
               />
             </div>
           </div>
+         {/* Hub */}
+          <div>
+        <label className="block text-sm font-medium">Source Hub</label>
+        <select
+          className="w-full border rounded px-3 py-2"
+          value={hubId}
+          onChange={(e) => setHubId(e.target.value)}
+        >
+          <option value="">Select Hub</option>
+          {hubs.map(h => (
+            <option key={h._id} value={h._id}>
+              {h.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
           {/* Country */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Country
+              Country *
             </label>
             <select
                 name="country"
@@ -253,7 +278,7 @@ const handleStateChange = (e) => {
                 {countries
     .filter((c) => EU_COUNTRY_CODES.includes(c.isoCode))
     .map((country) => (
-      <option key={country.name} value={country.name}>
+      <option key={country.isoCode} value={country.isoCode}>
         {country.name}
       </option>
     ))}
@@ -266,7 +291,7 @@ const handleStateChange = (e) => {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                State / Region / Province
+                State / Region / Province *
               </label>
               <select
                     name="state"
@@ -277,7 +302,7 @@ const handleStateChange = (e) => {
                     >
                     <option value="">Select State / Region</option>
                     {states.map((state) => (
-                        <option key={state.name} value={state.name}>
+                        <option key={state.isoCode} value={state.isoCode}>
                         {state.name}
                         </option>
                     ))}
@@ -327,7 +352,7 @@ const handleStateChange = (e) => {
 
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">
-                Zip Code
+                Zip Code *
               </label>
               <input
                 type="text"
@@ -357,7 +382,7 @@ const handleStateChange = (e) => {
               disabled={loading}
               className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
             >
-              {loading ? "Creating..." : "Create User"}
+              {loading ? "Adding..." : "Add Deilvery Agent"}
             </button>
           </div>
         </form>

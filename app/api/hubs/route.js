@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
-import User from "@/models/User";
+import Hub from "@/models/Hub";
 import mongoose from "mongoose";
 
 export async function GET(req) {
@@ -9,8 +9,22 @@ export async function GET(req) {
 
     const { searchParams } = new URL(req.url);
 
+
+    const dropdown = searchParams.get("dropdown");
+
+    if (dropdown === "true") {
+      const hubs = await Hub.find({ isActive: true })
+        .select("name address.city address.state address.country")
+        .sort({ name: 1 })
+        .lean();
+
+      return NextResponse.json({
+        success: true,
+        hubs,
+      });
+    }
+
     const status = searchParams.get("status") || "All";
-    const role = searchParams.get("role");
     const search = searchParams.get("search") || "";
     const page = parseInt(searchParams.get("page")) || 1;
     const limit = parseInt(searchParams.get("limit")) || 10;
@@ -20,10 +34,7 @@ export async function GET(req) {
     let query = {};
 
     /* ---------------- STATUS FILTER ---------------- */
-    if (status === "Verified") {
-      query.emailVerified = true;
-    }
-
+    
     if (status === "Active") {
       query.isActive = true;
     }
@@ -31,12 +42,6 @@ export async function GET(req) {
     if (status === "Inactive") {
       query.isActive = false;
     }
-
-    if (!role) {
-  query.role = "user"; // 👈 default role
-}else{
-  query.role = role;
-}
 
     /* ---------------- SEARCH FILTER ---------------- */
     if (search) {
@@ -68,14 +73,13 @@ export async function GET(req) {
 
     /* ---------------- FETCH DATA ---------------- */
     const [users, totalCount] = await Promise.all([
-      User.find(query)
-        .populate("hubId", "name") // Populate hub name
+      Hub.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .lean(),
 
-      User.countDocuments(query),
+      Hub.countDocuments(query),
     ]);
 
     const totalPages = Math.ceil(totalCount / limit);

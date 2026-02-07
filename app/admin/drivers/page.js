@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal,Search, X,User} from "lucide-react";
-//import AddVehicleModal from "./AddVehicleModal";
-//import User from "@/models/User";
+import { SlidersHorizontal,Search, X,User,Pencil} from "lucide-react";
+import AddDriverModal from "./AddDriverModal";
+
 
 
 
   
-export default function UserActivities() {
+export default function DriverActivities() {
 const [data, setData] = useState([]);
   const [status, setStatus] = useState("All");
   const [search, setSearch] = useState("");
@@ -16,16 +16,18 @@ const [data, setData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [openSearch, setOpenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [openVehicleModal, setOpenVehicleModal] = useState(false);
+  const [openDriverModal, setOpenDriverModal] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
+  
 
 
   useEffect(() => {
     fetch(
-      `/api/users?status=${status}&search=${search}&page=${page}&limit=10`
+      `/api/users?role=driver&status=${status}&search=${search}&page=${page}&limit=10`
     )
       .then(res => res.json())
       .then(res => {
-       setData(res.data ?? []);      // ✅ fallback to empty array
+       setData(res.users ?? []);      // ✅ fallback to empty array
   setTotalPages(res.totalPages ?? 1);
       });
   }, [status, search, page]);
@@ -39,21 +41,21 @@ const [data, setData] = useState([]);
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             <div className="flex"><button
-          onClick={() => setOpenVehicleModal(true)}
+          onClick={() => setOpenDriverModal(true)}
           className="flex px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         ><User size="20" color="white" className="mt-1 mr-1"></User>
-           Add New User
+           Add New Driver
         </button></div>
           </h3>
           
           <p className="text-sm text-gray-500 dark:text-gray-400">
-           Know your customers status and details at a glance.
+           Know your derivers status and details at a glance.
           </p>
         </div>
 
         <div className="flex flex-col gap-4 sm:flex-row lg:items-center">
           {/* Status Filters */}
-          {["All", "Verified", "Active", "Processing"].map(label => (
+          {["All", "Verified", "Active"].map(label => (
   <button
     key={label}
     onClick={() => {
@@ -101,7 +103,7 @@ const [data, setData] = useState([]);
           placeholder="Search User ID, name, email, phone number..."
           className="h-11 w-full rounded-lg border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-gray-900 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
         />
-      </div>
+      </div>   
 
       {/* Actions */}
       <div className="flex gap-2">
@@ -144,44 +146,10 @@ const [data, setData] = useState([]);
           <table className="min-w-full w-full table-auto">
             <thead>
               <tr className="border-b border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-                {/* Order ID Head */}
-                <th className="p-4">
-                  <div className="flex w-full items-center justify-between cursor-pointer">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <label className="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
-                          <span className="relative">
-                            <input type="checkbox" className="sr-only" />
-                            <span className="flex h-4 w-4 items-center justify-center rounded-sm border-[1.25px] bg-transparent border-gray-300 dark:border-gray-700">
-                              <span className="opacity-0">
-                                <svg
-                                  width="12"
-                                  height="12"
-                                  viewBox="0 0 12 12"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M10 3L4.5 8.5L2 6"
-                                    stroke="white"
-                                    strokeWidth="1.6666"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </span>
-                            </span>
-                          </span>
-                        </label>
-                      </div>
-                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        User ID
-                      </p>
-                    </div>
-                  </div>
-                </th>
+                
 
                 {/* Other table heads */}
-                {["Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country"].map(
+                {["Edit","Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Email Verification","Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -197,18 +165,78 @@ const [data, setData] = useState([]);
 
             {/* Table Body */}
             <tbody>
-  {data.map(vehicle => (
-    <tr key={parcel._id} className="hover:bg-gray-50">
-      <td className="p-4 text-xs">#{vehicle.vehicleType}</td>
-      <td className="p-4 text-xs">{vehicle.vehicleNumber}</td>
-      <td className="p-4 text-xs">{vehicle.capacityKg}-{parcel.capacityVolume}</td>
-      <td className="p-4 text-xs">{vehicle.brand}-{vehicle.year}-{vehicle.color}-{vehicle.modal}</td>
-      <td className="p-4 text-xs">{vehicle.driver}</td>
-      <td className="p-4 text-xs">{vehicle.registration}</td>
-      <td className="p-4 text-xs"><span className="text-xs font-medium">{vehicle.status}</span></td>
-    </tr>
-  ))}
+  {data.map((users) => {
+    const address =
+      typeof users.address === "object"
+        ? users.address
+        : {
+            street: users.address || "",
+            city: users.city || "",
+            state: users.state_region || "",
+            zipcode: users.zipCode || "",
+            country: users.country || "",
+          };
+
+    return (
+      <tr key={users._id} className="hover:bg-gray-50">
+        
+        <td className="p-4 text-xs"><button
+  onClick={() => {
+    setSelectedDriver(users);
+    setOpenDriverModal(true);
+  }}
+  className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+  title="Edit Driver"
+>
+  <Pencil size={18} />
+</button>
+</td>
+
+        <td className="p-4 text-xs">{users.name}</td>
+        <td className="p-4 text-xs">{users.email}</td>
+        <td className="p-4 text-xs">{users.phone}</td>
+
+        <td className="p-4 text-xs">
+          {address.street || "-"}
+        </td>
+
+        <td className="p-4 text-xs">
+          {address.city}-{address.zipcode}
+        </td>
+
+        <td className="p-4 text-xs">
+          {address.state} {address.country}
+        </td>
+
+        
+        <td className="p-4 text-xs">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              users.emailVerified
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {users.emailVerified ? "Yes" : "No"}
+          </span>
+        </td>
+
+        <td className="p-4 text-xs">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              users.isActive
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {users.isActive ? "Active" : "Inactive"}
+          </span>
+        </td>
+      </tr>
+    );
+  })}
 </tbody>
+
 
           </table>
           <div className="flex justify-end gap-2 p-4">
@@ -231,8 +259,16 @@ const [data, setData] = useState([]);
 
         </div>
       </div>
-{/* Modal */}
-      {openVehicleModal && <AddVehicleModal onClose={() => setOpenVehicleModal(false)} />}
+
+
+        {/* Modal */} 
+              {openDriverModal && <AddDriverModal 
+              driver={selectedDriver}
+                 onClose={() => {
+                    setOpenDriverModal(false);
+                    setSelectedDriver(null);
+                  }}
+                   />}
 
     </div>
 

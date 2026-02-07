@@ -10,7 +10,8 @@ import Image from "next/image";
 
 import {
   Menu as MenuIcon,X as XIcon,Sun,Moon,UserCircle,Home,Settings,Package,
-  ChevronDown,LogOut,Truck, Box, Users,MapPin, UserCog, Bike, Warehouse
+  ChevronDown,LogOut,Truck, Box, Users,MapPin, UserCog, Bike, Warehouse,
+  RotateCw, Container,Route
 } from "lucide-react";
 
 export default function DashboardLayout({ children }) {
@@ -46,11 +47,14 @@ export default function DashboardLayout({ children }) {
     { name: "Parcles", href: "/admin/parcels", icon: <Package size={20} /> },
     { name: "Add New Parcel", href: "/admin/booking", icon: <Box size={20} /> },
     { name: "Vehicles", href: "/admin/vehicles", icon: <Truck size={20} /> },
+    { name: "Drivers", href: "/admin/drivers", icon: <RotateCw  size={20} /> },
     { name: "Customers", href: "/admin/users", icon: <Users size={20} /> },
     { name: "Hub manager", href: "/admin/managers", icon: <UserCog size={20} /> },
     { name: "Hub/Ware Houses", href: "/admin/hubs", icon: <Warehouse size={20} /> },
     { name: "Deliver Agents", href: "/admin/agents", icon: <Bike size={20} /> },
-    { name: "Locations", href: "/admin/locations", icon: <MapPin size={20} /> },
+    { name: "Consignments", href: "/admin/consignments", icon: <Container size={20} /> },
+    { name: "Trip Management", href: "/admin/trips", icon: <Route size={20} /> },
+   
 
     { name: "Settings", href: "/admin/settings", icon: <Settings size={20} /> },
   ];
