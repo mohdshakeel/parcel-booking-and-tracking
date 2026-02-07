@@ -110,14 +110,6 @@ useEffect(() => {
     });
 }, [isEdit,selectedHub,driver.vehicleId]);
 
-
-
-
-
-
-
-
-
 const handleCountryChange = (e) => {
   const countryCode = e.target.value;
   setForm({ ...form, country: countryCode, state: "", city: "" });

@@ -1,30 +1,40 @@
-const ConsignmentSchema = new mongoose.Schema({
-  consignmentNumber: { type: String, unique: true },
+import mongoose from "mongoose";
+
+const { Schema } = mongoose;
+
+const ConsignmentSchema = new Schema({
+  consignmentNumber: {
+    type: String,
+    unique: true,
+    required: true,
+  },
 
   sourceHub: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Hub",
     required: true,
   },
 
   destinationHub: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Hub",
     required: true,
   },
 
-  parcels: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Parcel",
-  }],
+  parcels: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Parcel",
+    },
+  ],
 
   driver: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
   },
 
   vehicle: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Vehicle",
   },
 
@@ -32,15 +42,20 @@ const ConsignmentSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["CREATED", "ASSIGNED","IN_TRANSIT", "COMPLETED"],
+    enum: ["CREATED", "ASSIGNED", "IN_TRANSIT", "COMPLETED"],
     default: "CREATED",
   },
 
   createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "User",
   },
 
-  createdAt: { type: Date, default: Date.now },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
-export default mongoose.models.Parcel || mongoose.model("Consignment", ConsignmentSchema);
+
+export default mongoose.models.Consignment ||
+  mongoose.model("Consignment", ConsignmentSchema);
