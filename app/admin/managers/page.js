@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal,Search, X,UserCog2} from "lucide-react";
+import { SlidersHorizontal,Search, X,UserCog2,Pencil} from "lucide-react";
 import AddManagerModal from "./AddManagerModal";
 //import User from "@/models/User";
 
@@ -17,6 +17,7 @@ const [data, setData] = useState([]);
   const [openSearch, setOpenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [openManagerModal, setOpenManagerModal] = useState(false);
+  const [selectedManager, setSelectedManager] = useState(null);
 
 
   useEffect(() => {
@@ -147,7 +148,7 @@ const [data, setData] = useState([]);
               
 
                 {/* Other table heads */}
-                {["Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Hub","Verified/Status"].map(
+                {["Edit","Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Hub","Verified/Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -177,8 +178,16 @@ const [data, setData] = useState([]);
 
     return (
       <tr key={users._id} className="hover:bg-gray-50">
-       
-
+       <td className="p-4 text-xs"><button
+  onClick={() => {
+    setSelectedManager(users);
+    setOpenManagerModal(true);
+  }}
+  className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+  title="Edit Manager"
+><Pencil size={18} />
+</button>
+</td>
         <td className="p-4 text-xs">{users.name}</td>
         <td className="p-4 text-xs">{users.email}</td>
         <td className="p-4 text-xs">{users.phone}</td>
@@ -248,7 +257,7 @@ const [data, setData] = useState([]);
         </div>
       </div>
 {/* Modal */}
-      {openManagerModal && <AddManagerModal onClose={() => setOpenManagerModal(false)} />}
+      {openManagerModal && <AddManagerModal manager={selectedManager} onClose={() => {setOpenManagerModal(false);setSelectedManager(null);}} />}
 
     </div>
 

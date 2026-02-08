@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SlidersHorizontal,Search, X,User} from "lucide-react";
+import { SlidersHorizontal,Search, X,User,Pencil} from "lucide-react";
 import AddUserModal from "./AddUserModal";
 //import User from "@/models/User";
 
@@ -17,6 +17,7 @@ const [data, setData] = useState([]);
   const [openSearch, setOpenSearch] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [openUserModal, setOpenUserModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
 
   useEffect(() => {
@@ -147,7 +148,7 @@ const [data, setData] = useState([]);
                 
 
                 {/* Other table heads */}
-                {["Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Email Verification","Status"].map(
+                {["Edit","Name", "Email", "Phone", "Address", "City & Zip Code", "State & Country","Email Verification","Status"].map(
                   (head, i) => (
                     <th
                       key={i}
@@ -177,8 +178,17 @@ const [data, setData] = useState([]);
 
     return (
       <tr key={users._id} className="hover:bg-gray-50">
-       
-
+       <td className="p-4 text-xs"><button
+         onClick={() => {
+           setSelectedUser(users);
+           setOpenUserModal(true);
+         }}
+         className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+         title="Edit Driver"
+       >
+         <Pencil size={18} />
+       </button>
+       </td>
         <td className="p-4 text-xs">{users.name}</td>
         <td className="p-4 text-xs">{users.email}</td>
         <td className="p-4 text-xs">{users.phone}</td>
@@ -247,7 +257,7 @@ const [data, setData] = useState([]);
         </div>
       </div>
 {/* Modal */}
-      {openUserModal && <AddUserModal onClose={() => setOpenUserModal(false)} />}
+      {openUserModal && <AddUserModal user={selectedUser} onClose={() => {setOpenUserModal(false);setSelectedUser(null);}} />}
 
     </div>
 

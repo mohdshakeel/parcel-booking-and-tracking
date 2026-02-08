@@ -16,17 +16,21 @@ const ZIP_LOOKUP_SUPPORTED = ["IE", "FR"];
 const CITY_DROPDOWN_SUPPORTED = ["DE", "IT"];
 
 
-export default function AddCustomerModal({ onClose, onSubmit }) {
+export default function AddCustomerModal({ manager,onClose, onSuccess }) {
+  const isEdit = Boolean(manager?._id);
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
     street: "",
+    hubId: "",
     city: "",
     state: "",
     zipcode: "",
     country: "",
   });
+
+
 const [countries] = useState(Country.getAllCountries());
 const [states, setStates] = useState([]);
 const [cities, setCities] = useState([]);
@@ -36,6 +40,41 @@ const [successMsg, setSuccess] = useState("");
 
 const [hubs, setHubs] = useState([]);
 const [hubId, setHubId] = useState("");
+
+
+useEffect(() => {
+  if (!isEdit || !manager) return;
+
+  // 1) Fill basic form values
+  setForm({
+    name: manager.name || "",
+    email: manager.email || "",
+    phone: manager.phone || "",
+    street: manager.address?.street || "",
+    city: manager.address?.city || "",
+    state: manager.address?.state || "",
+    zipcode: manager.address?.zipcode || "",
+    country: manager.address?.country || "",
+  });
+// 3) Load states based on country
+  const countryCode = manager.address?.country || "";
+  if (countryCode) {
+    const stateList = State.getStatesOfCountry(countryCode);
+    setStates(stateList);
+
+    // 4) Load cities based on country + state
+    const stateCode = manager.address?.state || "";
+    if (stateCode) {
+      const cityList = City.getCitiesOfState(countryCode, stateCode);
+      setCities(cityList);
+    } else {
+      setCities([]);
+    }
+  } else {
+    setStates([]);
+    setCities([]);
+  }
+}, [isEdit, manager]);
 
 useEffect(() => {
     fetch("/api/hubs?dropdown=true")
@@ -75,8 +114,11 @@ const handleStateChange = (e) => {
     setSuccess("");
 
     try {
-      const res = await fetch("/api/users/create", {
-        method: "POST",
+      const requestMethod = isEdit ? "PUT" : "POST";
+      const requestURL = isEdit ? `/api/users/update/manager/${manager._id}`
+                            : `/api/users/create`;
+      const res = await fetch(requestURL, {
+        method: requestMethod,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
@@ -148,7 +190,7 @@ const handleStateChange = (e) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            Add New Manager
+            {isEdit ? "Edit Manager" : "Add New Manager"}
           </h2>
           <button
             onClick={onClose}
@@ -386,7 +428,7 @@ const handleStateChange = (e) => {
               disabled={loading}
               className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
             >
-              {loading ? "Adding..." : "Add Manager"}
+             {loading ? (isEdit ? "Updating..." : "Adding...") : (isEdit ? "Update Manager" : "Add Manager")}
             </button>
           </div>
         </form>

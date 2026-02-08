@@ -16,7 +16,8 @@ const ZIP_LOOKUP_SUPPORTED = ["IE", "FR"];
 const CITY_DROPDOWN_SUPPORTED = ["DE", "IT"];
 
 
-export default function AddCustomerModal({ onClose, onSubmit }) {
+export default function AddCustomerModal({ user, onClose, onSuccess }) {
+  const isEdit = Boolean(user?._id);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -34,7 +35,42 @@ const [loading, setLoading] = useState(false);
 const [errorMsg, setError] = useState("");
 const [successMsg, setSuccess] = useState("");
 
+useEffect(() => {
+  if (!isEdit || !user) return;
 
+  // 1) Fill basic form values
+  setForm({
+    name: user.name || "",
+    email: user.email || "",
+    phone: user.phone || "",
+    street: user.address?.street || "",
+    city: user.address?.city || "",
+    state: user.address?.state || "",
+    zipcode: user.address?.zipcode || "",
+    country: user.address?.country || "",
+  });
+ 
+  const countryCode = user.address?.country || "";
+  //alert(countryCode);
+    if (countryCode) {
+      const stateList = State.getStatesOfCountry(countryCode);
+      setStates(stateList);
+  
+      // 4) Load cities based on country + state
+      const stateCode = user.address?.state || "";
+      //alert(stateCode);
+      if (stateCode) {
+        const cityList = City.getCitiesOfState(countryCode, stateCode);
+        setCities(cityList);
+      } else {
+        setCities([]);
+      }
+    } else {
+      setStates([]);
+      setCities([]);
+    }
+
+}, [isEdit, user]);
 
 
 const handleCountryChange = (e) => {
@@ -64,8 +100,16 @@ const handleStateChange = (e) => {
     setSuccess("");
 
     try {
-      const res = await fetch("/api/users/create", {
-        method: "POST",
+
+      const requestUrl = isEdit
+      ? `/api/users/update/user/${user._id}`
+      : `/api/users/create`;
+
+      const requestMethod = isEdit ? "PUT" : "POST";
+
+
+      const res = await fetch(requestUrl, {
+        method: requestMethod,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
@@ -136,7 +180,7 @@ const handleStateChange = (e) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-800">
-            Add New Customer
+           {isEdit ? "Edit Customer" : "Add New Customer"}
           </h2>
           <button
             onClick={onClose}
@@ -253,7 +297,7 @@ const handleStateChange = (e) => {
                 {countries
     .filter((c) => EU_COUNTRY_CODES.includes(c.isoCode))
     .map((country) => (
-      <option key={country.name} value={country.name}>
+      <option key={country.isoCode} value={country.isoCode}>
         {country.name}
       </option>
     ))}
@@ -277,7 +321,7 @@ const handleStateChange = (e) => {
                     >
                     <option value="">Select State / Region</option>
                     {states.map((state) => (
-                        <option key={state.name} value={state.name}>
+                        <option key={state.isoCode} value={state.isoCode}>
                         {state.name}
                         </option>
                     ))}
@@ -353,12 +397,13 @@ const handleStateChange = (e) => {
               Cancel
             </button>
             <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
-            >
-              {loading ? "Creating..." : "Create User"}
-            </button>
+  type="submit"
+  disabled={loading}
+  className="rounded-lg bg-indigo-600 px-5 py-2 text-white hover:bg-indigo-700"
+>
+  {loading ? (isEdit ? "Updating..." : "Adding...") : (isEdit ? "Update User" : "Add User")}
+</button>
+
           </div>
         </form>
       </div>

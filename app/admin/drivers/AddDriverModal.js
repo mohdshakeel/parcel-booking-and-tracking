@@ -17,7 +17,7 @@ const CITY_DROPDOWN_SUPPORTED = ["DE", "IT"];
 
 
 export default function AddDriverModal({ driver, onClose, onSuccess }) {
-  console.log(driver);
+  //console.log(driver);
   const isEdit = Boolean(driver?._id);
   const [form, setForm] = useState({
     name: "",
@@ -108,7 +108,7 @@ useEffect(() => {
         }
       }
     });
-}, [isEdit,selectedHub,driver.vehicleId]);
+}, [selectedHub]);
 
 const handleCountryChange = (e) => {
   const countryCode = e.target.value;
@@ -138,7 +138,7 @@ const handleStateChange = (e) => {
 
   try {
     const url = isEdit
-      ? `/api/users/update/${driver._id}`
+      ? `/api/users/update/driver/${driver._id}`
       : `/api/users/create`;
 
     const method = isEdit ? "PUT" : "POST";
