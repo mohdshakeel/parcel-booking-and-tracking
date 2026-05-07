@@ -4,63 +4,100 @@ import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: corsHeaders,
+  });
+} 
+
 export async function POST(req) {
   try {
 
-  await connectDB();
+    await connectDB();
 
-  const { email, password } = await req.json();
-  const user = await User.findOne({ email }).select("+password");;
+    const { email, password } = await req.json();
 
-  if (!user) {
-    return NextResponse.json({ error: "Invalid email or password" }, { status: 400 });
-  }
+    const user = await User.findOne({ email }).select("+password");
 
-  const match = await bcrypt.compare(password, user.password);
+    if (!user) {
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
+      );
+    }
 
-  if (!match) {
-    return NextResponse.json({ error: "Invalid password" }, { status: 400 });
-  }
+    const match = await bcrypt.compare(password, user.password);
 
-console.log("User authenticated:", user.email);
-  
-  const token = signToken({ id: user._id, email: user.email});
+    if (!match) {
+      return NextResponse.json(
+        { error: "Invalid password" },
+        {
+          status: 400,
+          headers: corsHeaders,
+        }
+      );
+    }
 
-  const response = NextResponse.json({
-  message: "Login successful",
-  success: true,
-  user: {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-  },
- });
+    const token = signToken({
+      id: user._id,
+      email: user.email,
+    });
 
-response.cookies.set("role", user.role, {
-  httpOnly: true, // you need readable on frontend
-  secure: process.env.NODE_ENV === "production",
-  path: "/",
-  sameSite: "strict",
-  maxAge: 60 * 60 * 24 * 7 // 7 days
- });
- 
+    const response = NextResponse.json(
+      {
+        message: "Login successful",
+        success: true,
+        token, // IMPORTANT for React Native
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      },
+      {
+        headers: corsHeaders,
+      }
+    );
 
-
-response.cookies.set("token", token, {
+    response.cookies.set("role", user.role, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
     });
 
-  return response;
+    response.cookies.set("token", token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
+
   } catch (error) {
+
     return NextResponse.json(
-      { error: error.message+"Login failed" },
-      { status: 500 }
+      {
+        error: error.message,
+      },
+      {
+        status: 500,
+        headers: corsHeaders,
+      }
     );
   }
-
 }

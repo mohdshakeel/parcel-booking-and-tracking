@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import User from "@/models/User";
+import Hub from "@/models/Hub";
 import mongoose from "mongoose";
 
 export async function GET(req) {

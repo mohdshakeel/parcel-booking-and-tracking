@@ -39,7 +39,7 @@ const [errorMsg, setError] = useState("");
 const [successMsg, setSuccess] = useState("");
 
 const [hubs, setHubs] = useState([]);
-const [hubId, setHubId] = useState("");
+const [selectedHubId, setSelectedHub] = useState("");
 
 
 useEffect(() => {
@@ -56,6 +56,8 @@ useEffect(() => {
     zipcode: manager.address?.zipcode || "",
     country: manager.address?.country || "",
   });
+  //hubId
+  setSelectedHub(manager.hubId || "");  
 // 3) Load states based on country
   const countryCode = manager.address?.country || "";
   if (countryCode) {
@@ -125,7 +127,7 @@ const handleStateChange = (e) => {
           email: form.email,
           phone: form.phone,
           role: "manager",
-          hubId: hubId, 
+          hubId: selectedHubId, 
           address: {
             street: form.street,
             city: form.city,
@@ -142,7 +144,7 @@ const handleStateChange = (e) => {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setSuccess("Manager created successfully. Login details sent by email.");
+      setSuccess(data.message);
       onSuccess?.(data);
 
       setTimeout(() => {
@@ -296,8 +298,9 @@ const handleStateChange = (e) => {
         <label className="block text-sm font-medium">Source Hub</label>
         <select
           className="w-full border rounded px-3 py-2"
-          value={hubId}
-          onChange={(e) => setHubId(e.target.value)}
+          name="hubId"
+          value={selectedhubId}
+          onChange={(e) => setSelectedHub(e.target.value)}
         >
           <option value="">Select Hub</option>
           {hubs.map(h => (

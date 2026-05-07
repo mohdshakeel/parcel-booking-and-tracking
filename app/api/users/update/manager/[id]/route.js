@@ -16,7 +16,7 @@ export async function PUT(req, { params }) {
         email: body.email,
         phone: body.phone,
         role: body.role || "manager", // Default to "manager" if not provided
-        hubId: body.hubId || null, // ✅ ADD THIS
+        hubId: body.hubId || "", // ✅ ADD THIS
         address: {
           street: body.address?.street,
           city: body.address?.city,
