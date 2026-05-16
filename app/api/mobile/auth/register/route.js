@@ -25,7 +25,7 @@ export async function POST(req) {
     const { name, email, password,phone } = await req.json();
 
     if (!name || !email || !password || !phone)
-      return NextResponse.json({ message: "All fields are required",success:false }, { status: 40,headers: corsHeaders});
+      return NextResponse.json({ message: "All fields are required",success:false }, { status: 400,headers: corsHeaders});
 
     const userExists = await User.findOne({ email });
     if (userExists)
