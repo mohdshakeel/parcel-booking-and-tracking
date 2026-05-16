@@ -29,7 +29,7 @@ export async function POST(req) {
 
     const userExists = await User.findOne({ email });
     if (userExists)
-      return NextResponse.json({ message: "User already exists",success:false }, { status: 400,headers: corsHeaders });
+      return NextResponse.json({ message: "User already exists",success:false }, { status: 409,headers: corsHeaders });
 
     //const hashedPassword = await bcrypt.hash(password, 10);
     const verifyToken = crypto.randomBytes(32).toString("hex");
@@ -50,7 +50,7 @@ export async function POST(req) {
 
     return NextResponse.json(
       { message: "User registered successfully. An Verification email has benn sent to your email to activate your account.", user, success: true },
-      { status: 201,headers: corsHeaders }
+      { status: 200,headers: corsHeaders }
     );
 
   } catch (error) {
