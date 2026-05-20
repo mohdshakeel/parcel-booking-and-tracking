@@ -57,7 +57,7 @@ export async function POST(req) {
       {
         message: "Login successful",
         success: true,
-        token, // IMPORTANT for React Native
+        token, // IMPORTANT for React Native 
         user: {
           id: user._id,
           name: user.name,
