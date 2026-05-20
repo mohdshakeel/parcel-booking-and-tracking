@@ -69,7 +69,7 @@ export async function POST(req) {
           address: user.address,
           phone: user.phone,
           zipCode: user.zipCode,
-
+          
         },
       },
       {
