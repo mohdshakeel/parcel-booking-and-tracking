@@ -21,6 +21,7 @@ export async function POST(req) {
   try {
 
     await connectDB();
+    const baseUrl = "https://parcel-booking-and-tracking.vercel.app";
 
     const { email, password } = await req.json();
 
@@ -60,23 +61,43 @@ export async function POST(req) {
     token,
 
     user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
 
-      profileImage: user.profileImage
-        ? `${process.env.NEXTAUTH_URL}${user.profileImage}`
-        : null,
+  profileImage: user.profileImage
+    ? `${baseUrl}${user.profileImage}`
+    : null,
 
-      address: user.address?.street,
-      city: user.address?.city,
-      state: user.address?.state,
-      country: user.address?.country,
-      zipCode: user.address?.zipcode,
+  address:
+    typeof user.address === "string"
+      ? user.address
+      : user.address?.street || "",
 
-      phone: user.phone,
-    },
+  city:
+    user.city ||
+    user.address?.city ||
+    "",
+
+  state:
+    user.state ||
+    user.state_region ||
+    user.address?.state ||
+    "",
+
+  country:
+    user.country ||
+    user.address?.country ||
+    "",
+
+  zipCode:
+    user.zipCode ||
+    user.address?.zipcode ||
+    "",
+
+  phone: user.phone || "",
+},
   },
   {
     headers: corsHeaders,
