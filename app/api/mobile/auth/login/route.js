@@ -53,47 +53,51 @@ export async function POST(req) {
       id: user._id,
       email: user.email,
     });
-
+ const addressData =
+  typeof user.address === "object" ? user.address
+: {};
     const response = NextResponse.json(
   {
     message: "Login successful",
     success: true,
     token,
 
-    user: {
+  
+
+user: {
   id: user._id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
+  name: user.name || "",
+  email: user.email || "",
+  role: user.role || "user",
 
   profileImage: user.profileImage
     ? `${baseUrl}${user.profileImage}`
-    : null,
+    : "",
 
   address:
     typeof user.address === "string"
       ? user.address
-      : user.address?.street || "",
+      : addressData.street || "",
 
   city:
     user.city ||
-    user.address?.city ||
+    addressData.city ||
     "",
 
   state:
     user.state ||
     user.state_region ||
-    user.address?.state ||
+    addressData.state ||
     "",
 
   country:
     user.country ||
-    user.address?.country ||
+    addressData.country ||
     "",
 
   zipCode:
     user.zipCode ||
-    user.address?.zipcode ||
+    addressData.zipcode ||
     "",
 
   phone: user.phone || "",
