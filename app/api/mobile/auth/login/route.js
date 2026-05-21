@@ -54,28 +54,34 @@ export async function POST(req) {
     });
 
     const response = NextResponse.json(
-      {
-        message: "Login successful",
-        success: true,
-        token, // IMPORTANT for React Native 
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          profileImage: user.profileImage,
-          city: user.city,
-          country: user.country,  
-          address: user.address,
-          phone: user.phone,
-          zipCode: user.zipCode,
-          
-        },
-      },
-      {
-        headers: corsHeaders,
-      }
-    );
+  {
+    message: "Login successful",
+    success: true,
+    token,
+
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+
+      profileImage: user.profileImage
+        ? `${process.env.NEXTAUTH_URL}${user.profileImage}`
+        : null,
+
+      address: user.address?.street,
+      city: user.address?.city,
+      state: user.address?.state,
+      country: user.address?.country,
+      zipCode: user.address?.zipcode,
+
+      phone: user.phone,
+    },
+  },
+  {
+    headers: corsHeaders,
+  }
+);
 
     response.cookies.set("role", user.role, {
       httpOnly: false,
