@@ -115,6 +115,8 @@ export async function GET(req, { params }) {
 // UPDATE USER
 // ==========================================
 export async function PUT(req, { params }) {
+  const { id } = params;
+
   try {
     await connectDB();
 
@@ -148,7 +150,7 @@ export async function PUT(req, { params }) {
     const data = await req.json();
   
     // SECURITY
-    if (decoded.id !== params.id) {
+    if (decoded.id !== id) {
       return NextResponse.json(
         {
           error:
