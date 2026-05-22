@@ -115,7 +115,7 @@ export async function GET(req, { params }) {
 // UPDATE USER
 // ==========================================
 export async function PUT(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     await connectDB();
