@@ -146,13 +146,14 @@ export async function PUT(req, { params }) {
 
     // USER DATA
     const data = await req.json();
-
+  
     // SECURITY
     if (decoded.id !== params.id) {
       return NextResponse.json(
         {
           error:
             "You are not allowed to update another user profile.", 
+            message: "You can only update your own profile."+decoded.id+'-'+params.id
 
         },
         {
