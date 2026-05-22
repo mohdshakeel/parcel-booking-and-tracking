@@ -167,38 +167,79 @@ export async function PUT(req, { params }) {
 
     // UPDATE
     const user =
-      await User.findByIdAndUpdate(
-        id,
-        data,
-        {
-          new: true,
-        }
-      ).select("-password");
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "User not found",
-        },
-        {
-          status: 404,
-          headers: corsHeaders,
-        }
-      );
+  await User.findByIdAndUpdate(
+    id,
+    data,
+    {
+      new: true,
     }
+  ).select("-password");
 
-    return NextResponse.json(
-      {
-        success: true,
-        message:
-          "User updated successfully",
-        user,
-      },
-      {
-        headers: corsHeaders,
-      }
-    );
+if (!user) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: "User not found",
+    },
+    {
+      status: 404,
+      headers: corsHeaders,
+    }
+  );
+}
+
+const baseUrl =
+  "https://parcel-booking-and-tracking.vercel.app";
+
+return NextResponse.json(
+  {
+    success: true,
+    message: "User updated successfully",
+
+    user: {
+      id: user._id,
+      name: user.name || "",
+      email: user.email || "",
+      role: user.role || "user",
+
+      profileImage: user.profileImage
+        ? `${baseUrl}${user.profileImage}`
+        : "",
+
+      // ✅ OLD + NEW ADDRESS STRUCTURE SUPPORT
+      address:
+        typeof user.address === "string"
+          ? user.address
+          : user.address?.street || "",
+
+      city:
+        user.city ||
+        user.address?.city ||
+        "",
+
+      state:
+        user.state ||
+        user.state_region ||
+        user.address?.state ||
+        "",
+
+      country:
+        user.country ||
+        user.address?.country ||
+        "",
+
+      zipCode:
+        user.zipCode ||
+        user.address?.zipcode ||
+        "",
+
+      phone: user.phone || "",
+    },
+  },
+  {
+    headers: corsHeaders,
+  }
+);
   } catch (error) {
     return NextResponse.json(
       {
