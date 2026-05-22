@@ -1,17 +1,13 @@
 import connectDB from "@/lib/db";
 import User from "@/models/User";
-
 import jwt from "jsonwebtoken";
-
 import { NextResponse } from "next/server";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-
   "Access-Control-Allow-Methods":
     "GET, POST, PUT, DELETE, OPTIONS",
-
-  "Access-Control-Allow-Headers":
+   "Access-Control-Allow-Headers":
     "Content-Type, Authorization",
 };
 
@@ -140,7 +136,7 @@ export async function PUT(req, { params }) {
         }
       );
     }
-
+//get the token from the header and verify it
     const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(
@@ -152,14 +148,12 @@ export async function PUT(req, { params }) {
     const data = await req.json();
 
     // SECURITY
-    if (
-      decoded.role !== "admin" &&
-      decoded.id !== params.id
-    ) {
+    if (decoded.id !== params.id) {
       return NextResponse.json(
         {
           error:
-            "You are not allowed to update another user profile",
+            "You are not allowed to update another user profile.", 
+
         },
         {
           status: 403,
@@ -216,91 +210,3 @@ export async function PUT(req, { params }) {
   }
 }
 
-// ==========================================
-// DELETE USER
-// ==========================================
-export async function DELETE(req, { params }) {
-  try {
-    await connectDB();
-
-    // TOKEN
-    const authHeader =
-      req.headers.get("authorization");
-
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
-      return NextResponse.json(
-        {
-          error: "Unauthorized",
-        },
-        {
-          status: 401,
-          headers: corsHeaders,
-        }
-      );
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
-
-    // ONLY ADMIN
-    if (decoded.role !== "admin") {
-      return NextResponse.json(
-        {
-          error:
-            "Only admin can delete users",
-        },
-        {
-          status: 403,
-          headers: corsHeaders,
-        }
-      );
-    }
-
-    const user =
-      await User.findByIdAndDelete(
-        params.id
-      );
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "User not found",
-        },
-        {
-          status: 404,
-          headers: corsHeaders,
-        }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        message:
-          "User deleted successfully",
-      },
-      {
-        headers: corsHeaders,
-      }
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        error: error.message,
-      },
-      {
-        status: 500,
-        headers: corsHeaders,
-      }
-    );
-  }
-}
