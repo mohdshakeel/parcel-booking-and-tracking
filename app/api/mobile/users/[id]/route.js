@@ -168,7 +168,7 @@ export async function PUT(req, { params }) {
     // UPDATE
     const user =
       await User.findByIdAndUpdate(
-        params.id,
+        id,
         data,
         {
           new: true,
