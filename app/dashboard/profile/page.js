@@ -26,11 +26,11 @@ useEffect(() => {
 
   setName(session.user.name ?? "");
   setPhone(session.user.phone ?? "");
-  setAddress(session.user.address?.street ?? "");
-  setCity(session.user.address?.city ?? "");
-  setStateRegion(session.user.state_region ?? "");
-  setZipCode(session.user.address?.zipcode ?? "");
-  setCountry(session.user.address?.country ?? "");
+  setAddress(session.user.address.street ?? "");
+  setCity(session.user.address.city ?? "");
+  setStateRegion(session.user.address.state ?? "");
+  setZipCode(session.user.address.zipcode ?? "");
+  setCountry(session.user.address.country ?? "");
 }, [session?.user]);
 
 console.log("ProfilePage session data:", user);
