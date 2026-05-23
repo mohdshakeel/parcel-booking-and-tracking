@@ -26,13 +26,13 @@ const ParcelSchema = new mongoose.Schema({
 sourceHubId: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "Hub",
-  required: true
+  required: false
 },
 
 destinationHubId: {
   type: mongoose.Schema.Types.ObjectId,
   ref: "Hub",
-  required: true
+  required: false
 },
 consignmentId: {
     type: mongoose.Schema.Types.ObjectId,
