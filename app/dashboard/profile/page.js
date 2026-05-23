@@ -26,7 +26,11 @@ useEffect(() => {
 
   setName(session.user.name ?? "");
   setPhone(session.user.phone ?? "");
-  setAddress(session.user.address.street ?? "");
+ setAddress(
+    typeof session.user.address === "object"
+      ? session.user.address?.street || ""
+      : session.user.address || ""
+  );
   setCity(session.user.address.city ?? "");
   setStateRegion(session.user.address.state ?? "");
   setZipCode(session.user.address.zipcode ?? "");
