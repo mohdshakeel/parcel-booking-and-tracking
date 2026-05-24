@@ -16,7 +16,7 @@ const ZIP_LOOKUP_SUPPORTED = ["IE", "FR"];
 const CITY_DROPDOWN_SUPPORTED = ["DE", "IT"];
 
 
-export default function AddCustomerModal({ manager,onClose, onSuccess }) {
+export default function AddManagerModal({ manager,onClose, onSuccess }) {
   const isEdit = Boolean(manager?._id);
   const [form, setForm] = useState({
     name: "",
