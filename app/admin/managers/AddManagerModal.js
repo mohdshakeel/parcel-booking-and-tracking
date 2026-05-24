@@ -39,7 +39,7 @@ const [errorMsg, setError] = useState("");
 const [successMsg, setSuccess] = useState("");
 
 const [hubs, setHubs] = useState([]);
-const [selectedHubId, setSelectedHub] = useState("");
+const [selectedHub, setSelectedHub] = useState("");
 
 
 useEffect(() => {
@@ -299,7 +299,7 @@ const handleStateChange = (e) => {
         <select
           className="w-full border rounded px-3 py-2"
           name="hubId"
-          value={selectedhubId}
+          value={selectedhub}
           onChange={(e) => setSelectedHub(e.target.value)}
         >
           <option value="">Select Hub</option>
