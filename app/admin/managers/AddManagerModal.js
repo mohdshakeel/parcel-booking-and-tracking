@@ -299,7 +299,7 @@ const handleStateChange = (e) => {
         <select
           className="w-full border rounded px-3 py-2"
           name="hubId"
-          value={selectedhub}
+          value={selectedHub}
           onChange={(e) => setSelectedHub(e.target.value)}
         >
           <option value="">Select Hub</option>
