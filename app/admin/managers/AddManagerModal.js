@@ -127,7 +127,7 @@ const handleStateChange = (e) => {
           email: form.email,
           phone: form.phone,
           role: "manager",
-          hubId: selectedHubId, 
+          hubId: selectedHub, 
           address: {
             street: form.street,
             city: form.city,
