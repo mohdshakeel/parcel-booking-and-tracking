@@ -7,13 +7,12 @@ import { NextResponse } from "next/server";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers":
-    "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Max-Age": "86400",
 };
 
 export async function OPTIONS() {
-  return NextResponse.json({}, {
+  return new NextResponse(null, {
     status: 204,
     headers: corsHeaders,
   });
@@ -23,13 +22,9 @@ export async function GET(req) {
   try {
     await connectDB();
 
-    const authHeader =
-      req.headers.get("authorization");
+    const authHeader = req.headers.get("authorization");
 
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         {
           success: false,
@@ -42,27 +37,20 @@ export async function GET(req) {
       );
     }
 
-    const token =
-      authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET
     );
 
-  const parcels = await Parcel.find({
-  assignments: {
-    $elemMatch: {
-      userId: decoded.id.toString(),
-    },
-  },
-});
+    const user = await User.findById(decoded.id);
 
-    if (!parcels) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
-          error: "Parcels not found",
+          error: "User not found",
         },
         {
           status: 404,
@@ -78,8 +66,7 @@ export async function GET(req) {
       return NextResponse.json(
         {
           success: false,
-          error:
-            "Only delivery agents can access tasks",
+          error: "Only agents can access tasks",
         },
         {
           status: 403,
@@ -88,30 +75,25 @@ export async function GET(req) {
       );
     }
 
-    const parcel = await Parcel.find({
-  assignments: {
-    $elemMatch: {
-      userId: decoded.id.toString(),
-    },
-  },
-})
-        .sort({ createdAt: -1 })
-        .populate(
-          "sourceHubId",
-          "name"
-        )
-        .populate(
-          "destinationHubId",
-          "name"
-        );
+    const parcels = await Parcel.find({
+      assignments: {
+        $elemMatch: {
+          userId: decoded.id.toString(),
+        },
+      },
+    })
+      .sort({ createdAt: -1 })
+      .populate("sourceHubId", "name")
+      .populate("destinationHubId", "name");
 
     return NextResponse.json(
       {
         success: true,
-        count: parcel.length,
-        data: parcel,
+        count: parcels.length,
+        data: parcels,
       },
       {
+        status: 200,
         headers: corsHeaders,
       }
     );
