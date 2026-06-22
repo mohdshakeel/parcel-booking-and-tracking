@@ -39,12 +39,34 @@ consignmentId: {
     ref: "Consignment",
     default: null,
 },
-assignedAgentId: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  default: null,
-},
+assignments: [
+  {
+    type: {
+      type: String,
+      enum: ["pickup", "transport", "delivery"],
+    },
 
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    vehicleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Vehicle",
+    },
+
+    assignedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    assignedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  },
+],
 userId:String,
 
   createdAt: { type: Date, default: Date.now }
