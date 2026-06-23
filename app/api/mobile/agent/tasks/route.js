@@ -39,10 +39,25 @@ export async function GET(req) {
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+   let decoded;
+
+try {
+  decoded = jwt.verify(
+    token,
+    process.env.JWT_SECRET
+  );
+} catch (err) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: "Invalid token",
+    },
+    {
+      status: 401,
+      headers: corsHeaders,
+    }
+  );
+}
 
     const user = await User.findById(decoded.id);
 
@@ -51,6 +66,7 @@ export async function GET(req) {
         {
           success: false,
           error: "User not found",
+
         },
         {
           status: 404,
