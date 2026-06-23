@@ -101,12 +101,13 @@ try {
       .sort({ createdAt: -1 })
       .populate("sourceHubId", "name")
       .populate("destinationHubId", "name");
-
+    
     return NextResponse.json(
       {
         success: true,
         count: parcels.length,
         data: parcels,
+        user:decoded.id
       },
       {
         status: 200,
