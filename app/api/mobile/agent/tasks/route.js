@@ -92,13 +92,9 @@ try {
     }
 
     const parcels = await Parcel.find({
-      assignments: {
-        $elemMatch: {
-          userId: decoded.id.toString(),
-        },
-      },
-    })
-      .sort({ createdAt: -1 })
+  "assignments.userId": decoded.id,
+})
+.sort({ createdAt: -1 })
       .populate("sourceHubId", "name")
       .populate("destinationHubId", "name");
     
