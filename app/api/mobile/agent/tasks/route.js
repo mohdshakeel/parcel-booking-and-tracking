@@ -93,10 +93,8 @@ try {
 
     const parcels = await Parcel.find({
   "assignments.userId": decoded.id,
-})
-.sort({ createdAt: -1 })
-      .populate("sourceHubId", "name")
-      .populate("destinationHubId", "name");
+});
+
     
     return NextResponse.json(
       {
