@@ -92,7 +92,7 @@ try {
     }
 const userId = user._id;
     const parcels = await Parcel.find({
-  "assignments.userId": userId,
+  "assignments.userId": userId.toString(),
 });
 
     
@@ -101,7 +101,7 @@ const userId = user._id;
         success: true,
         count: parcels.length,
         data: parcels,
-        test:"This is a test field 4",
+        test:"This is a test field 5",
         user:userId
       },
       {
