@@ -101,6 +101,7 @@ try {
         success: true,
         count: parcels.length,
         data: parcels,
+        test:"This is a test field",
         user:decoded.id
       },
       {
