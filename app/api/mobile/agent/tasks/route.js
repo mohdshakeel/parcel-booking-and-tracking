@@ -90,7 +90,7 @@ try {
         }
       );
     }
-const userId = new mongoose.Types.ObjectId(decoded.id);
+const userId = user._id;
     const parcels = await Parcel.find({
   "assignments.userId": userId,
 });
@@ -101,8 +101,8 @@ const userId = new mongoose.Types.ObjectId(decoded.id);
         success: true,
         count: parcels.length,
         data: parcels,
-        test:"This is a test field 3",
-        user:decoded.id
+        test:"This is a test field 4",
+        user:userId
       },
       {
         status: 200,
