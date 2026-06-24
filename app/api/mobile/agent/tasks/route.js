@@ -22,38 +22,6 @@ export async function GET(req) {
   try {
     await connectDB();
 
-    import mongoose from "mongoose";
-import Parcel from "@/models/Parcel";
-
-export async function GET() {
-  // 1. Find all parcels that have assignments
-  const parcels = await Parcel.find({ "assignments.0": { $exists: true } });
-  
-  let updatedCount = 0;
-
-  for (const parcel of parcels) {
-    let modified = false;
-
-    // Loop through each assignment in the parcel
-    parcel.assignments = parcel.assignments.map((assign) => {
-      // Check if userId exists and is stored as a string type
-      if (assign.userId && typeof assign.userId === "string") {
-        assign.userId = new mongoose.Types.ObjectId(assign.userId);
-        modified = true;
-      }
-      return assign;
-    });
-
-    if (modified) {
-      await parcel.save();
-      updatedCount++;
-    }
-  }
-
-  return NextResponse.json({ message: `Successfully updated ${updatedCount} parcels.`,headers: corsHeaders });
-}
-
-
     const authHeader = req.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
