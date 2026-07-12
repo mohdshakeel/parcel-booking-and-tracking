@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
 import { sendEmail } from "@/lib/sendEmail"; // Your email helper
-import { sendSMS } from "@/lib/sendSMS"; // Your SMS helper (optional)
+//import { sendSMS } from "@/lib/sendSMS"; // Your SMS helper (optional)
 
 const OTP_EXPIRY_MINUTES = 10;
 
@@ -119,12 +119,12 @@ export async function POST(request,{ params }) {
     // ==========================
     // Send SMS (Optional)
     // ==========================
-    if (parcel.senderPhone) {
+   /* if (parcel.senderPhone) {
       await sendSMS(
         parcel.senderPhone,
         `Your Eagle Express Delivery OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
       );
-    }
+    }*/
 
     return NextResponse.json({
       success: true,
