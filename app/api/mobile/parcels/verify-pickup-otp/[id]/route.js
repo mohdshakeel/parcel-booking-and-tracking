@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
-import OtpLog from "@/models/OtpLog";
+
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_MINUTES = 15;
