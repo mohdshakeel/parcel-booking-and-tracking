@@ -90,10 +90,10 @@ try {
         }
       );
     }
-const userId = user._id;
+    //const userId = user._id;
     const parcels = await Parcel.find({
-  "assignments.userId": decoded.id,
-});
+    "assignments.userId": decoded.id,
+    });
 
     
     return NextResponse.json(
@@ -102,7 +102,7 @@ const userId = user._id;
         count: parcels.length,
         data: parcels,
         test:"This is a test field 5",
-        user:userId
+        user:decoded.id
       },
       {
         status: 200,

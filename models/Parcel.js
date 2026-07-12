@@ -67,9 +67,47 @@ assignments: [
     },
   },
 ],
-userId:String,
+pickupOtp: {
+    code: String,
+    expiresAt: Date,
+    verified: {
+        type: Boolean,
+        default: false,
+    },
 
-  createdAt: { type: Date, default: Date.now }
+    generatedAt: Date,
+
+    lastSentAt: Date,
+
+    failedAttempts: {
+        type: Number,
+        default: 0,
+    },
+
+    blockedUntil: Date,
+},
+
+deliveryOtp: {
+    code: String,
+    expiresAt: Date,
+    verified: {
+        type: Boolean,
+        default: false,
+    },
+
+    generatedAt: Date,
+
+    lastSentAt: Date,
+
+    failedAttempts: {
+        type: Number,
+        default: 0,
+    },
+
+    blockedUntil: Date,
+},
+userId:String,
+createdAt: { type: Date, default: Date.now }
 });
 
 export default mongoose.models.Parcel || mongoose.model("Parcel", ParcelSchema);
