@@ -7,6 +7,19 @@ import Parcel from "@/models/Parcel";
 
 const MAX_ATTEMPTS = 5;
 const BLOCK_MINUTES = 15;
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 
 export async function POST(request, { params }) {
   try {
@@ -39,7 +52,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "OTP is required.",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -52,7 +65,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "Parcel not found.",
         },
-        { status: 404 }
+        { status: 404, headers: corsHeaders }
       );
     }
 
@@ -69,7 +82,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "You are not assigned for this delivery.",
         },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -80,7 +93,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "No active OTP found.",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -105,7 +118,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "Too many failed attempts. Try again later.",
         },
-        { status: 429 }
+        { status: 429, headers: corsHeaders }
       );
     }
 
@@ -119,7 +132,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "OTP has expired.",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -144,7 +157,7 @@ export async function POST(request, { params }) {
             MAX_ATTEMPTS - parcel.deliveryOtp.failedAttempts
           ),
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -178,7 +191,7 @@ export async function POST(request, { params }) {
         success: false,
         message: "Internal Server Error",
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
