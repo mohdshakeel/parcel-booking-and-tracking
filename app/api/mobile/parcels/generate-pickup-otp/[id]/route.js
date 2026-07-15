@@ -115,9 +115,22 @@ export async function POST(request,{ params }) {
     // ==========================
     // Send Email
     // ==========================
-    if (parcel.senderEmail) {
+    const user = await User.findById(assignment.userId).select("email phone name");
+
+if (!user) {
+  return NextResponse.json(
+    {
+      success: false,
+      message: "User not found.",
+    },
+    { status: 404, headers: corsHeaders }
+  );
+}
+const email = user.email;
+    //const name = user.name;
+    if (email) {
       await sendEmail({
-        to: parcel.senderEmail,
+        to: email,
         subject: "Pickup Verification OTP",
         html: `
           <h2>Eagle Express</h2>
