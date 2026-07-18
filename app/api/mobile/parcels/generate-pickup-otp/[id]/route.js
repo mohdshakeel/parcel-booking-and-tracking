@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
-import { sendEmail } from "@/lib/mail"; // Your email helper
+import { sendEmail } from "@/lib/mail"; // Your email 
+import User from "@/models/User"; // Your User model
 //import { sendSMS } from "@/lib/sendSMS"; // Your SMS helper (optional)
 
 
@@ -166,7 +167,8 @@ const email = user.email;
     return NextResponse.json(
       {
         success: false,
-        message: "Internal Server Error",
+        message: "Internal Server Error"+errror.message,
+        
       },
 
   {
