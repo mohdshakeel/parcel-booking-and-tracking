@@ -36,7 +36,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "Unauthorized",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -104,7 +104,7 @@ export async function POST(request, { params }) {
           success: false,
           message: "Delivery already verified.",
         },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
