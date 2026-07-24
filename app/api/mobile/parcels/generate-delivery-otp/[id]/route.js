@@ -7,6 +7,19 @@ import { sendEmail } from "@/lib/mail"; // Your email helper
 
 const OTP_EXPIRY_MINUTES = 10;
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
@@ -25,7 +38,7 @@ export async function POST(request,{ params }) {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 ,headers: corsHeaders }
       );
     }
 
@@ -41,7 +54,7 @@ export async function POST(request,{ params }) {
     if (!parcel) {
       return NextResponse.json(
         { success: false, message: "Parcel not found." },
-        { status: 404 }
+        { status: 404 ,headers: corsHeaders }
       );
     }
 
@@ -60,7 +73,7 @@ export async function POST(request,{ params }) {
           success: false,
           message: "You are not assigned for delivery."
         },
-        { status: 403 }
+        { status: 403 ,headers: corsHeaders }
       );
     }
 
@@ -78,7 +91,7 @@ export async function POST(request,{ params }) {
           success: false,
           message: "Delivery OTP already generated."
         },
-        { status: 400 }
+        { status: 400 ,headers: corsHeaders }
       );
     }
 
@@ -138,7 +151,7 @@ export async function POST(request,{ params }) {
         success: false,
         message: "Internal Server Error",
       },
-      { status: 500 }
+      { status: 500 ,headers: corsHeaders }
     );
   }
 }
