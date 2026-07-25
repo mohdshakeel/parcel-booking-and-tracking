@@ -144,12 +144,12 @@ export async function POST(request,{ params }) {
       message: "Delivery OTP sent successfully.",
     });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Internal Server Error",
+        message: "Internal Server Error: " + error.message,
       },
       { status: 500 ,headers: corsHeaders }
     );
