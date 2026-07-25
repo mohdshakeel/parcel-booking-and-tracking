@@ -72,7 +72,7 @@ export async function POST(request,{ params }) {
       return NextResponse.json(
         {
           success: false,
-          message: "You are not assigned for delivery." + decoded.id + " " + assignment,
+          message: "You are not assigned for delivery." + decoded.id + " " + parcel.assignments,
         },
         { status: 403 ,headers: corsHeaders }
       );
