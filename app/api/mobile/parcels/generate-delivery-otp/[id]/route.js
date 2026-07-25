@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
-import { sendEmail } from "@/lib/mail"; // Your email helper
+import { sendEmail } from "@/lib/mail"; // Your email 
+import User from "@/models/User"; // Your User model
 //import { sendSMS } from "@/lib/sendSMS"; // Your SMS helper (optional)
 
 const OTP_EXPIRY_MINUTES = 10;
