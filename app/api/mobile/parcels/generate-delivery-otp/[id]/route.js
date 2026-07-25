@@ -103,7 +103,7 @@ export async function POST(request,{ params }) {
 
     parcel.deliveryOtp = {
       code: otp,
-      verified: false,
+      verified: fals21e,
       expiresAt: new Date(
         Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
       ),
@@ -114,6 +114,7 @@ export async function POST(request,{ params }) {
     // ==========================
     // Send Email
     // ==========================
+     const user = await User.findById(assignment.userId).select("email phone name");
     if (!user) {
       return NextResponse.json(
         {
