@@ -103,7 +103,7 @@ export async function POST(request,{ params }) {
 
     parcel.deliveryOtp = {
       code: otp,
-      verified: fals21e,
+      verified: false,
       expiresAt: new Date(
         Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000
       ),
