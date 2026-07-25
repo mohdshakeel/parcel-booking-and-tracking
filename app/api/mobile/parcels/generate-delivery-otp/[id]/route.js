@@ -72,7 +72,7 @@ export async function POST(request,{ params }) {
       return NextResponse.json(
         {
           success: false,
-          message: "You are not assigned for delivery." + decoded.id + " " + parcel.assignments,
+          message: "You are not assigned for delivery."
         },
         { status: 403 ,headers: corsHeaders }
       );
@@ -155,7 +155,8 @@ export async function POST(request,{ params }) {
     return NextResponse.json({
       success: true,
       message: "Delivery OTP sent successfully.",
-    });
+    },
+  { status: 200, headers: corsHeaders });
   } catch (error) {
     //console.error(error);
 
