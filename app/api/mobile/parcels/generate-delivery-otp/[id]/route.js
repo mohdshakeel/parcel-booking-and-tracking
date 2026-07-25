@@ -114,10 +114,21 @@ export async function POST(request,{ params }) {
     // ==========================
     // Send Email
     // ==========================
-    if (parcel.senderEmail) {
-      await sendEmail({
-        to: parcel.senderEmail,
-        subject: "Delivery Verification OTP",
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "User not found.",
+        },
+        { status: 404, headers: corsHeaders }
+      );
+    }
+    const email = user.email;
+        //const name = user.name;
+        if (email) {
+          await sendEmail({
+            to: email,
+            subject: "Delivery Verification OTP",
         html: `
           <h2>Eagle Express</h2>
 
