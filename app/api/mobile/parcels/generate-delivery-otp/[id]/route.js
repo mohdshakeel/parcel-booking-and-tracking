@@ -65,7 +65,7 @@ export async function POST(request,{ params }) {
     const assignment = parcel.assignments.find(
       (a) =>
         a.userId.toString() === decoded.id &&
-        a.type === "deliver"
+        a.type === "delivery"
     );
 
     if (!assignment) {
