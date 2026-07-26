@@ -181,7 +181,9 @@ export async function POST(request, { params }) {
       success: true,
       message: "Delivery verified successfully.",
       status: parcel.status,
-    });
+    },
+    { status: 200, headers: corsHeaders }
+  );
 
   } catch (error) {
     console.error(error);
