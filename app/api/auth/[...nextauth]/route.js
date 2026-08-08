@@ -22,7 +22,7 @@ export const authOptions = {
 
         const { email, password } = credentials;
         const user = await User.findOne({ email }).select("+password");
-         console.log("ADDRESS FROM DB:", user.address);
+         //console.log("ADDRESS FROM DB:", user.address);
         if (!user) throw new Error("No user found with this email");
         if (!user.emailVerified) throw new Error("Please verify your email first");
         if (!user.password) throw new Error("User has no password stored");
