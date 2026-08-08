@@ -44,7 +44,9 @@ export const authOptions = {
             street: user.address?.street ?? "",
             city: user.address?.city ?? "",
             state: user.address?.state ?? "",
-            zip: user.address?.zip ?? "",
+            zipcode: user.address?.zipcode ?? "",
+            country: user.address?.country ?? "",
+
           },
         };
       },
@@ -66,7 +68,8 @@ export const authOptions = {
           street: session.address?.street ?? "",
           city: session.address?.city ?? "",
           state: session.address?.state ?? "",
-          zip: session.address?.zip ?? "",
+          zipcode: session.address?.zipcode ?? "",
+          country: session.address?.country ?? "",
         };
       }
 
@@ -83,7 +86,8 @@ export const authOptions = {
           street: user.address?.street ?? "",
           city: user.address?.city ?? "",
           state: user.address?.state ?? "",
-          zip: user.address?.zip ?? "",
+          zipcode: user.address?.zipcode ?? "",
+          country: user.address?.country ?? "",
         };
       }
 
@@ -104,7 +108,8 @@ export const authOptions = {
           street: token.address?.street ?? "",
           city: token.address?.city ?? "",
           state: token.address?.state ?? "",
-          zip: token.address?.zip ?? "",
+          zipcode: token.address?.zipcode ?? "",
+          country: token.address?.country ?? "",
         },
       };
       return session;
