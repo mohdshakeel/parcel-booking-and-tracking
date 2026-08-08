@@ -120,8 +120,15 @@ console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode,
     name,
     phone,
     profileImage: previewUrl,
-    address
+    address:{
+      street: street,
+      city: city,
+      state: state_region,  
+    zipcode: zipCode,
+    country: country,
+    }
   });
+
       setStatus({ loading: false, error: "", success: true ,message:"Profile updated successfully"});
       
     } else {
