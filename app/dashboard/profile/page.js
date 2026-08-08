@@ -13,7 +13,7 @@ export default function ProfilePage() {
 
 const [name, setName] = useState("");
 const [phone, setPhone] = useState("");
-const [address, setAddress] = useState("");
+const [street, setStreet] = useState("");
 const [city, setCity] = useState("");
 const [state_region, setStateRegion] = useState("");
 const [zipCode, setZipCode] = useState("");
@@ -26,7 +26,7 @@ useEffect(() => {
 
   setName(session.user.name ?? "");
   setPhone(session.user.phone ?? "");
- setAddress(
+ setStreet(
     typeof session.user.address === "object"
       ? session.user.address?.street || ""
       : session.user.address || ""
@@ -38,7 +38,7 @@ useEffect(() => {
 }, [session?.user]);
 
 console.log("ProfilePage session data:", user);
-console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode, country, profileImage: session?.user?.profileImage });
+console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode, country, profileImage: session?.user?.profileImage });
 
 // Image states
   const [imageFile, setImageFile] = useState(null); // original File
@@ -124,11 +124,7 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
     name,
     phone,
     profileImage: previewUrl,
-    address,
-    country,
-    state_region,
-    city,
-    zipCode,
+    address
   });
       setStatus({ loading: false, error: "", success: true ,message:"Profile updated successfully"});
       //alert("Profile saved Loved it!");
@@ -144,7 +140,20 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
     e.preventDefault();
     const  id  = user.id;
     setStatus({ loading: true, error: "", success: false });
-    await saveProfile(user.id,{ id, name, phone, address, city, state_region,country,zipCode, profileImage: previewUrl });
+    await saveProfile(user.id, {
+  id,
+  name,
+  phone,
+  address: {
+    street: street,
+    city: city,
+    state: state_region,
+    zipcode: zipCode,
+    country: country,
+  },
+  profileImage: previewUrl,
+});
+
 
     
   };
@@ -247,7 +256,7 @@ console.log("STATE VALUES:", { name, phone, address, city, state_region, zipCode
           <InputBlock label="Full Name" value={name} onChange={setName} />
           <InputBlock label="Email Address" value={user?.email || ""} disabled />
           <InputBlock label="Phone Number" value={phone} onChange={setPhone} />
-          <InputBlock label="Address" value={address} onChange={setAddress} />
+          <InputBlock label="Address" value={street} onChange={setStreet} />
           <InputBlock label="City" value={city} onChange={setCity} />
           <InputBlock label="State" value={state_region} onChange={setStateRegion} />
           <InputBlock label="Zip Code" value={zipCode} onChange={setZipCode} />
