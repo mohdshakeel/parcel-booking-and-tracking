@@ -13,117 +13,109 @@ export const authOptions = {
         password: {},
       },
 
-async authorize(credentials) {
-  await connectDB();
+      async authorize(credentials) {
+        await connectDB();
 
-  if (!credentials?.email || !credentials?.password) {
-    throw new Error("Email and password are required");
-  }
-
-  const { email, password } = credentials;
-
-  const user = await User.findOne({ email }).select("+password");
-
-  if (!user) {
-    throw new Error("No user found with this email");
-  }
-
-  // BLOCK LOGIN IF NOT VERIFIED
-        if (!user.emailVerified) {
-          throw new Error("Please verify your email first");
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password are required");
         }
 
+        const { email, password } = credentials;
+        const user = await User.findOne({ email }).select("+password");
 
-  if (!user.password) {
-    throw new Error("User has no password stored");
-  }
+        if (!user) throw new Error("No user found with this email");
+        if (!user.emailVerified) throw new Error("Please verify your email first");
+        if (!user.password) throw new Error("User has no password stored");
 
-  const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) throw new Error("Incorrect password");
 
-  if (!passwordMatch) {
-    throw new Error("Incorrect password");
-  }
-
-  return {
-    authenticated: true,
-    id: user._id.toString(),
-    name: user.name,
-    email: user.email,
-    phone:user.phone,
-    role: user.role,
-    profileImage: user.profileImage,
-    address: user.address,
-    country: user.country,
-    state_region: user.state_region,
-    city: user.city,
-   zipCode: user.zipCode,
-   emailVerified: user.emailVerified,
-  };
-}
-
-
+        return {
+          authenticated: true,
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+          profileImage: user.profileImage,
+          emailVerified: user.emailVerified,
+          // ✅ Safe optional chaining — won't crash if address is null
+          address: {
+            street: user.address?.street ?? "",
+            city: user.address?.city ?? "",
+            state: user.address?.state ?? "",
+            zip: user.address?.zip ?? "",
+          },
+        };
+      },
     }),
   ],
 
- callbacks: {
-  async jwt({ token, trigger, session, user }) {
+  callbacks: {
+    async jwt({ token, trigger, session, user }) {
 
-    // when update() is called
-    if (trigger === "update" && session) {
-      token.name = session.name;
-      token.phone = session.phone;
-      token.profileImage = session.profileImage;
-      token.address = session.address;
-      token.country = session.country;
-      token.state_region = session.state_region;
-      token.city = session.city;
-      token.zipCode = session.zipCode;
-      token.role = session.role;
-      token.emailVerified = session.emailVerified;
-    }
+      // ✅ When update() is called from client
+      if (trigger === "update" && session) {
+        token.name = session.name;
+        token.phone = session.phone;
+        token.profileImage = session.profileImage;
+        token.role = session.role;
+        token.emailVerified = session.emailVerified;
+        // ✅ Store address as nested object in token
+        token.address = {
+          street: session.address?.street ?? "",
+          city: session.address?.city ?? "",
+          state: session.address?.state ?? "",
+          zip: session.address?.zip ?? "",
+        };
+      }
 
-    // first login
-    if (user) {
-      token.id = user.id;
-      token.name = user.name;
-      token.phone = user.phone;
-      token.profileImage = user.profileImage;
-      token.address = user.address;
-      token.country = user.country;
-      token.state_region = user.state_region;
-      token.city = user.city;
-      token.zipCode = user.zipCode;
-      token.role = user.role;
-      token.emailVerified = user.emailVerified;
-    }
+      // ✅ First login — populate token from user returned by authorize
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.phone = user.phone;
+        token.profileImage = user.profileImage;
+        token.role = user.role;
+        token.emailVerified = user.emailVerified;
+        // ✅ Nested address object stored in token
+        token.address = {
+          street: user.address?.street ?? "",
+          city: user.address?.city ?? "",
+          state: user.address?.state ?? "",
+          zip: user.address?.zip ?? "",
+        };
+      }
 
-    return token;
+      return token;
+    },
+
+    async session({ session, token }) {
+      session.user = {
+        ...session.user,
+        id: token.id,
+        name: token.name,
+        phone: token.phone,
+        profileImage: token.profileImage,
+        role: token.role,
+        emailVerified: token.emailVerified,
+        // ✅ Pass the full nested address object — matches what's in the token
+        address: {
+          street: token.address?.street ?? "",
+          city: token.address?.city ?? "",
+          state: token.address?.state ?? "",
+          zip: token.address?.zip ?? "",
+        },
+      };
+      return session;
+    },
   },
 
-  async session({ session, token }) {
-    session.user = {
-      ...session.user,
-      id: token.id,
-      name: token.name,
-      phone: token.phone,
-      profileImage: token.profileImage,
-      address: token.address,
-      country: token.country,
-      state_region: token.state_region,
-      city: token.city,
-      zipCode: token.zipCode,
-      role: token.role,
-      emailVerified: token.emailVerified,
-    };
-    return session;
-  },
-},
   secret: process.env.NEXTAUTH_SECRET,
   session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
+  pages: { signIn: "/login" },
   debug: true,
 };
+
 const handler = NextAuth(authOptions);
 export { handler as POST, handler as GET };

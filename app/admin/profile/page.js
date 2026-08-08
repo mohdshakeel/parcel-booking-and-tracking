@@ -23,7 +23,7 @@ const [status, setStatus] = useState({ loading: false, error: "", success: false
 // Sync with session once it loads
 useEffect(() => {
   if (!session?.user) return;
-
+  console.log(session?.user?.address);
   setName(session.user.name ?? "");
   setPhone(session.user.phone ?? "");
   setStreet(session.user.address.street ?? "");
