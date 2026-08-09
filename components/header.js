@@ -14,6 +14,8 @@ export default function Header() {
 const logout = useLogout();
 
    const hideHeader = pathname?.startsWith("/dashboard");
+   hideHeader = pathname?.startsWith("/admin");
+
 
 if (hideHeader) {
   return null; // Hide header for all routes starting with /dashboard
