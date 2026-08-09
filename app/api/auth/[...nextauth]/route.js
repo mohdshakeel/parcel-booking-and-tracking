@@ -58,6 +58,7 @@ export const authOptions = {
 
       // ✅ When update() is called from client
       if (trigger === "update" && session) {
+        
         token.name = session.name;
         token.phone = session.phone;
         token.profileImage = session.profileImage;

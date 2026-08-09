@@ -6,8 +6,7 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const role = req.nextauth.token?.role;
 
-  
-
+console.log("MIDDLEWARE TOKEN:", req.nextauth.token);
     // 🔐 Dashboard routes → user only
     if (pathname.startsWith("/dashboard")) {
       if (role !== "user" && role !== "admin") {
