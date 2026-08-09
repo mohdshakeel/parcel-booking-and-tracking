@@ -37,8 +37,8 @@ useEffect(() => {
   setCountry(session.user.address.country ?? "");
 }, [session?.user]);
 
-console.log("ProfilePage session data:", user);
-console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode, country, profileImage: session?.user?.profileImage });
+//console.log("ProfilePage session data:", user);
+//console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode, country, profileImage: session?.user?.profileImage });
 
 // Image states
   const [imageFile, setImageFile] = useState(null); // original File
@@ -120,7 +120,7 @@ console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode,
     const data = await res.json();
     if (data?.user) {
       // reflect changes locally
-      await update({
+  /*await update({
     name,
     phone,
     profileImage: previewUrl,
@@ -131,7 +131,7 @@ console.log("STATE VALUES:", { name, phone, street, city, state_region, zipCode,
       zipcode: zipCode,
       country: country,
     }
-  });
+  });*/
       setStatus({ loading: false, error: "", success: true ,message:"Profile updated successfully"});
       //alert("Profile saved Loved it!");
       // Optionally revalidate server components or refresh page to pick up new session data
