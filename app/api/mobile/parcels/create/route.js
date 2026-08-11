@@ -71,7 +71,8 @@ export async function POST(req) {
     const parcel = await Parcel.create({
       ...data,
       trackingId,
-      userId,senderName: user.name,
+      userId,
+      senderName: user.name,
   senderPhone: user.phone,
   senderEmail: user.email,
 

@@ -14,11 +14,12 @@ export default function Header() {
 const logout = useLogout();
 
    const hideHeader = pathname?.startsWith("/dashboard");
-   hideHeader = pathname?.startsWith("/admin");
+   const hideHeader2 = pathname?.startsWith("/admin");
 
 
-if (hideHeader) {
-  return null; // Hide header for all routes starting with /dashboard
+
+if (hideHeader || hideHeader2) {
+  return null; // Hide header for all routes starting with /dashboard or /admin
 }
 
 return (
