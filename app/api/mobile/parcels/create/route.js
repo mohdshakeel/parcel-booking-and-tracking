@@ -56,13 +56,27 @@ export async function POST(req) {
 
     // ✅ Generate tracking ID
     const trackingId = `TRK-${ulid().toUpperCase()}`;
+    const senderAddress = [
+  user.address?.street,
+  user.address?.city,
+  user.address?.zipcode,
+  user.address?.state,
+  user.address?.country,
+]
+  .filter(Boolean)
+  .join(", ");
+
 
     // ✅ Create parcel
     const parcel = await Parcel.create({
       ...data,
       trackingId,
-      userId,
-    });
+      userId,senderName: user.name,
+  senderPhone: user.phone,
+  senderEmail: user.email,
+
+  senderAddress
+});
 
     return NextResponse.json(
       {
