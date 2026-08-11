@@ -50,6 +50,20 @@ export async function POST(req) {
     );
 
     const userId = decoded.id;
+    const user = await User.findById(userId).lean();
+
+if (!user) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: "User not found",
+    },
+    {
+      status: 404,
+      headers: corsHeaders,
+    }
+  );
+}
 
     // ✅ Get request data
     const data = await req.json();
