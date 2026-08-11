@@ -1,5 +1,6 @@
 import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
+import User from "@/models/User";
 import jwt from "jsonwebtoken";
 import { ulid } from "ulid";
 import { NextResponse } from "next/server";
