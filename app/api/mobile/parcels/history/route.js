@@ -36,7 +36,7 @@ export async function GET(request) {
           success: false,
           message: "Authorization token is required",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -46,7 +46,7 @@ export async function GET(request) {
           success: false,
           message: "Invalid authorization format",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -58,7 +58,7 @@ export async function GET(request) {
           success: false,
           message: "Token is missing",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -79,7 +79,7 @@ export async function GET(request) {
           success: false,
           message: "Invalid or expired token",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -95,7 +95,7 @@ export async function GET(request) {
           success: false,
           message: "User ID not found in token",
         },
-        { status: 401 }
+        { status: 401, headers: corsHeaders }
       );
     }
 
@@ -153,7 +153,7 @@ export async function GET(request) {
             invalidStatuses,
             allowedStatuses,
           },
-          { status: 400 }
+          { status: 400, headers: corsHeaders }
         );
       }
 
@@ -194,7 +194,7 @@ export async function GET(request) {
 
         parcels,
       },
-      { status: 200 }
+      { status: 200, headers: corsHeaders }
     );
   } catch (error) {
     console.error("GET PARCELS ERROR:", error);
@@ -205,7 +205,7 @@ export async function GET(request) {
         message: "Failed to fetch parcels",
         error: error.message,
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }
