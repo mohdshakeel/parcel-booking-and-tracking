@@ -1,9 +1,21 @@
 import { NextResponse } from "next/server";
+import connectDB from "@/lib/db";
+import Parcel from "@/models/Parcel";
 import jwt from "jsonwebtoken";
 
-import connectDB from "@/lib/mongodb";
-import Parcel from "@/models/Parcel";
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization",
+};
 
+// Handle preflight requests
+export async function OPTIONS() {
+  return NextResponse.json({}, {
+    headers: corsHeaders,
+  });
+}
 export async function GET(request) {
   try {
     // ==========================================
