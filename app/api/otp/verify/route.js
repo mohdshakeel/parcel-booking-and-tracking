@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import mongoose, { Types } from "mongoose";
 
-import connectDB from "@/lib/mongodb";
+import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
 import ParcelOTP from "@/models/ParcelOTP";
 import {
