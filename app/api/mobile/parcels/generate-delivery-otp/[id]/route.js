@@ -145,12 +145,12 @@ export async function POST(request,{ params }) {
     // ==========================
     // Send SMS (Optional)
     // ==========================
-   /* if (parcel.senderPhone) {
+   if (parcel.senderPhone) {
       await sendSMS(
         parcel.senderPhone,
         `Your Eagle Express Delivery OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
       );
-    }*/
+    }
 
     return NextResponse.json({
       success: true,

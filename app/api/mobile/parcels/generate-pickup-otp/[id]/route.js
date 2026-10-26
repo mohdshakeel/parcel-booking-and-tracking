@@ -4,7 +4,7 @@ import connectDB from "@/lib/db";
 import Parcel from "@/models/Parcel";
 import { sendEmail } from "@/lib/mail"; // Your email 
 import User from "@/models/User"; // Your User model
-//import { sendSMS } from "@/lib/sendSMS"; // Your SMS helper (optional)
+import { sendSMS } from "@/lib/parcel-otp"; // Your SMS helper (optional)
 
 
 
@@ -148,12 +148,12 @@ const email = user.email;
     // ==========================
     // Send SMS (Optional)
     // ==========================
-   /* if (parcel.senderPhone) {
+    if (parcel.senderPhone) {
       await sendSMS(
         parcel.senderPhone,
         `Your Eagle Express Pickup OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
       );
-    } */
+    } 
 
     return NextResponse.json({
       success: true,
