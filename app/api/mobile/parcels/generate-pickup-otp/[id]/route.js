@@ -114,60 +114,94 @@ export async function POST(request,{ params }) {
     await parcel.save();
 
     // ==========================
-    // Send Email
+    // Send Pickup OTP to Sender
     // ==========================
-    const user = await User.findById(assignment.userId).select("email phone name");
+    const senderEmail = parcel.senderEmail;
 
-if (!user) {
-  return NextResponse.json(
-    {
-      success: false,
-      message: "User not found.",
-    },
-    { status: 404, headers: corsHeaders }
-  );
-}
-const email = user.email;
-    //const name = user.name;
-    if (email) {
+    if (!senderEmail) {
+      parcel.pickupOtp = undefined;
+      await parcel.save();
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Sender email address not available.",
+        },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    try {
       await sendEmail({
-        to: email,
+        to: senderEmail,
         subject: "Pickup Verification OTP",
         html: `
           <h2>Eagle Express</h2>
-
-          <p>Your Pickup OTP is</p>
-
+          <p>Your Pickup OTP is:</p>
           <h1>${otp}</h1>
-
           <p>This OTP will expire in ${OTP_EXPIRY_MINUTES} minutes.</p>
+          <p>Please do not share this OTP with anyone except the authorized pickup agent.</p>
         `,
       });
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Pickup OTP sent successfully to sender.",
+          deliveryStatus: {
+            email: {
+              success: true,
+              message: "Email sent successfully.",
+            },
+          },
+        },
+        { status: 200, headers: corsHeaders }
+      );
+    } catch (error) {
+      console.error("Pickup OTP email error:", error);
+
+      parcel.pickupOtp = undefined;
+      await parcel.save();
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to send pickup OTP email.",
+          deliveryStatus: {
+            email: {
+              success: false,
+              message: error.message || "Email sending failed.",
+            },
+          },
+        },
+        { status: 502, headers: corsHeaders }
+      );
     }
+
+    
+    
+
 
     // ==========================
     // Send SMS (Optional)
     // ==========================
-    if (parcel.senderPhone) {
+   /* 
+   if (parcel.senderPhone) {
       await sendSMS(
         parcel.senderPhone,
         `Your Eagle Express Pickup OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
       );
     } 
+      */
 
-    return NextResponse.json({
-      success: true,
-      message: "Pickup OTP sent successfully.",
-    },
   
-  { status: 200, headers: corsHeaders });
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "Internal Server Error"+errror.message,
+        message: "Internal Server Error"+error.message,
         
       },
 

@@ -96,6 +96,7 @@ export async function POST(request,{ params }) {
       );
     }
 
+
     // ==========================
     // Generate OTP
     // ==========================
@@ -111,52 +112,83 @@ export async function POST(request,{ params }) {
 
     await parcel.save();
 
+    
     // ==========================
-    // Send Email
+    // Send Delivery OTP to Sender
     // ==========================
-     const user = await User.findById(assignment.userId).select("email phone name");
-    if (!user) {
+    const receiverEmail = parcel.receiverEmail;
+
+    if (!receiverEmail) {
+      parcel.deliveryOtp = undefined;
+      await parcel.save();
+
       return NextResponse.json(
         {
           success: false,
-          message: "User not found.",
+          message: "Receiver email address not available.",
         },
-        { status: 404, headers: corsHeaders }
+        { status: 400, headers: corsHeaders }
       );
     }
-    const email = user.email;
-        //const name = user.name;
-        if (email) {
-          await sendEmail({
-            to: email,
-            subject: "Delivery Verification OTP",
+
+    try {
+      await sendEmail({
+        to: receiverEmail,
+        subject: "Delivery Verification OTP",
         html: `
           <h2>Eagle Express</h2>
-
-          <p>Your Delivery OTP is</p>
-
+          <p>Your Delivery OTP is:</p>
           <h1>${otp}</h1>
-
           <p>This OTP will expire in ${OTP_EXPIRY_MINUTES} minutes.</p>
+          <p>Please do not share this OTP with anyone except the authorized delivery agent.</p>
         `,
       });
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "Delivery OTP sent successfully to receiver.",
+          deliveryStatus: {
+            email: {
+              success: true,
+              message: "Email sent successfully.",
+            },
+          },
+        },
+        { status: 200, headers: corsHeaders }
+      );
+    } catch (error) {
+      console.error("Delivery OTP email error:", error);
+
+      parcel.deliveryOtp = undefined;
+      await parcel.save();
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to send delivery OTP email.",
+          deliveryStatus: {
+            email: {
+              success: false,
+              message: error.message || "Email sending failed.",
+            },
+          },
+        },
+        { status: 502, headers: corsHeaders }
+      );
     }
 
     // ==========================
     // Send SMS (Optional)
     // ==========================
-   if (parcel.senderPhone) {
+   /*if (parcel.senderPhone) {
       await sendSMS(
         parcel.senderPhone,
         `Your Eagle Express Delivery OTP is ${otp}. Valid for ${OTP_EXPIRY_MINUTES} minutes.`
       );
-    }
+    }*/
 
-    return NextResponse.json({
-      success: true,
-      message: "Delivery OTP sent successfully.",
-    },
-  { status: 200, headers: corsHeaders });
+   
   } catch (error) {
     //console.error(error);
 
@@ -169,3 +201,4 @@ export async function POST(request,{ params }) {
     );
   }
 }
+
